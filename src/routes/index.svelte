@@ -7,12 +7,8 @@
       userTo: "1"
     };
 
-    const url = `/api/debt/${defaultUsers.userFrom}-${defaultUsers.userTo}.json`;
-    const res = await fetch(url, {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    });
+    const url = `/api/debt.json?user1=${defaultUsers.userFrom}&user2=${defaultUsers.userTo}`;
+    const res = await fetch(url);
 
     if (res.ok) {
       return {};
