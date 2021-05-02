@@ -13,7 +13,7 @@ export type Data = {
 };
 
 export type DataWithId = {
-  id: string,
+  id: string;
   from: string;
   to: string;
   amount: number;
@@ -27,12 +27,15 @@ db.defaults({
 }).write();
 
 export function getDebtsOfUser(userId: string): DataWithId[] {
-  const results = db.get("debts").filter((entry: DataWithId) => {
-    if (entry.from === userId || entry.to === userId) {
-      return true;
-    }
-    return false;
-  }).value();
+  const results = db
+    .get("debts")
+    .filter((entry: DataWithId) => {
+      if (entry.from === userId || entry.to === userId) {
+        return true;
+      }
+      return false;
+    })
+    .value();
   return results;
 }
 
@@ -42,4 +45,12 @@ export function addDebt(data: Data): void {
     .push({ id: String(lastCount), ...data })
     .write();
   db.set("count", lastCount + 1).write();
+}
+
+export function updateDebt(id: string, is_paid: boolean): void {
+  db.get("debts").find({ id: id }).assign({ is_paid: is_paid }).write();
+}
+
+export function deleteDebt(id: string): void {
+  db.get("debts").remove({ id: id }).write();
 }

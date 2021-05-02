@@ -29,7 +29,7 @@
 </script>
 
 <script lang="ts">
-  import { Header, Content, Grid, Row, Column, Tile } from "carbon-components-svelte";
+  import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
   import DebtForm from "$lib/DebtForm/index.svelte";
   import DebtTile from "$lib/DebtTile/index.svelte";
   import type { DataWithId } from "$lib/database";
@@ -69,6 +69,10 @@
   };
 
   $: fetchDebtsFromDatabase(userFrom);
+  
+  const handleDebtDelete = (e) => {
+    debts = debts.filter((d) => d.id !== e.detail);
+  }
 </script>
 
 <Header company="Ootang" platformName="IOU Tracker" />
@@ -88,13 +92,18 @@
         </Column>
       </Row>
     {:else}
-      {#each debts as debt (debt.id)}
-        <DebtTile
-          bind:debt
-          userFrom={people.find((p) => p.id === debt.from)}
-          userTo={people.find((p) => p.id === debt.to)}
-        />
-      {/each}
+      <Row padding>
+        {#each debts as debt (debt.id)}
+          <Column sm={2} md={3}>
+            <DebtTile
+              bind:debt
+              userFrom={people.find((p) => p.id === debt.from)}
+              userTo={people.find((p) => p.id === debt.to)}
+              on:debtDelete={handleDebtDelete}
+            />
+          </Column>
+        {/each}
+      </Row>
     {/if}
   </Grid>
 </Content>
