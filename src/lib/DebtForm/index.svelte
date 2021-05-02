@@ -119,7 +119,7 @@
   </Row>
   <Row padding>
     <Column style="text-align: right;">
-      <Button type="submit" disabled={isFromAndToSame}>Add</Button>
+      <Button type="submit" disabled={isFromAndToSame} on:click>Add</Button>
     </Column>
   </Row>
 </Form>

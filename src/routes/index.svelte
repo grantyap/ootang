@@ -54,11 +54,10 @@
   export let debts: DataWithId[];
 
   // FIXME: Probably cache these results.
-  const fetchDebtsFromDatabase = (user: string) => {
-    const url = `http://localhost:3000/api/debt.json?user=${user}`;
-    fetch(url).then(async (res) => {
-      debts = await res.json();
-    });
+  const fetchDebtsFromDatabase = async (user: string) => {
+    const url = `/api/debt.json?user=${user}`;
+    const res = await fetch(url).then((res) => res.json());
+    debts = res;
   };
 
   const handleDebtDelete = (e) => {
@@ -73,6 +72,9 @@
     <DebtForm
       users={people}
       on:submit={() => {
+        fetchDebtsFromDatabase(userFrom);
+      }}
+      on:click={() => {
         fetchDebtsFromDatabase(userFrom);
       }}
       on:select={(e) => {
