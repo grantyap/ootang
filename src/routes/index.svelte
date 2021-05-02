@@ -88,13 +88,17 @@
         </Column>
       </Row>
     {:else}
-      {#each debts as debt (debt.id)}
-        <DebtTile
-          bind:debt
-          userFrom={people.find((p) => p.id === debt.from)}
-          userTo={people.find((p) => p.id === debt.to)}
-        />
-      {/each}
+      <Row padding>
+        {#each debts as debt (debt.id)}
+          <Column sm={4} md={2}>
+            <DebtTile
+              bind:debt
+              userFrom={people.find((p) => p.id === debt.from)}
+              userTo={people.find((p) => p.id === debt.to)}
+            />
+          </Column>
+        {/each}
+      </Row>
     {/if}
   </Grid>
 </Content>
