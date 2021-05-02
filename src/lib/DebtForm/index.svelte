@@ -7,8 +7,7 @@
     TextInput,
     Form,
     FormGroup,
-    Select,
-    SelectItem
+    Dropdown
   } from "carbon-components-svelte";
 
   type User = {
@@ -22,6 +21,14 @@
 
   $: isFromAndToSame = userFrom === userTo;
 
+  let userFromIndex = 0;
+  let userToIndex = 1;
+
+  $: {
+    userFrom = users[userFromIndex].id;
+    userTo = users[userToIndex].id;
+  }
+
   let moneyOwedValue = 0;
 
   $: moneyOwedString = isFromAndToSame
@@ -33,7 +40,7 @@
       `₱${moneyOwedValue.toFixed(2)}`;
 
   let description = "";
-  
+
   const clearForm = () => {
     moneyOwedValue = 0;
     description = "";
@@ -68,27 +75,19 @@
   <Row>
     <Column md={4}>
       <FormGroup>
-        <Select id="from" labelText="From" value={users[0].text} bind:selected={userFrom}>
-          {#each users as user (user.id)}
-            <SelectItem value={user.id} text={user.text} />
-          {/each}
-        </Select>
+        <Dropdown id="from" titleText="From" bind:selectedIndex={userFromIndex} items={users} />
       </FormGroup>
     </Column>
     <Column md={4}>
       <FormGroup>
-        <Select
+        <Dropdown
           id="to"
-          labelText="To"
-          value={users[1].text}
-          bind:selected={userTo}
+          titleText="To"
+          bind:selectedIndex={userToIndex}
+          items={users}
           invalid={isFromAndToSame}
           invalidText="You can't owe yourself!"
-        >
-          {#each users as user (user.id)}
-            <SelectItem value={user.id} text={user.text} />
-          {/each}
-        </Select>
+        />
       </FormGroup>
     </Column>
   </Row>

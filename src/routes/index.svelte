@@ -69,10 +69,10 @@
   };
 
   $: fetchDebtsFromDatabase(userFrom);
-  
+
   const handleDebtDelete = (e) => {
     debts = debts.filter((d) => d.id !== e.detail);
-  }
+  };
 </script>
 
 <Header company="Ootang" platformName="IOU Tracker" />
