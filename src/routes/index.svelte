@@ -76,7 +76,8 @@
         fetchDebtsFromDatabase(userFrom);
       }}
       on:select={(e) => {
-        fetchDebtsFromDatabase(e.detail.selectedItem.id);
+        userFrom = e.detail.selectedItem.id;
+        fetchDebtsFromDatabase(userFrom);
       }}
     />
     {#if debts.length === 0}
@@ -91,6 +92,7 @@
           <Column sm={2} md={3}>
             <DebtTile
               bind:debt
+              currentUser={people.find((p) => p.id === userFrom)}
               userFrom={people.find((p) => p.id === debt.from)}
               userTo={people.find((p) => p.id === debt.to)}
               on:debtDelete={handleDebtDelete}

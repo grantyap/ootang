@@ -14,6 +14,7 @@
   const dispatch = createEventDispatcher();
 
   export let debt: DataWithId;
+  export let currentUser: User = null;
   export let userFrom: User;
   export let userTo: User;
 
@@ -48,13 +49,13 @@
     <h3>{debt.description}</h3>
     <p>
       <span class="small">From:</span>
-      <span class:bold={debt.from === userFrom.id} class:green={debt.from === userFrom.id}>
+      <span class:bold={debt.from === currentUser.id} class:green={debt.from === currentUser.id}>
         {userFrom.text}
       </span>
     </p>
     <p>
       <span class="small">To:</span>
-      <span class:bold={debt.to === userFrom.id} class:green={debt.to === userFrom.id}>
+      <span class:bold={debt.to === currentUser.id} class:green={debt.to === currentUser.id}>
         {userTo.text}
       </span>
     </p>
