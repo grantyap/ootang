@@ -2,15 +2,15 @@
   import type { DataWithId } from "$lib/database";
 
   import { createEventDispatcher } from "svelte";
-  import { Tile, Checkbox, Button, Modal } from "carbon-components-svelte";
+  import { fade } from "svelte/transition";
+  import { Row, Column, Tile, Checkbox, Modal } from "carbon-components-svelte";
+  import { TrashCan32 } from "carbon-icons-svelte";
 
   const dispatch = createEventDispatcher();
 
   export let debt: DataWithId;
   export let userFrom;
   export let userTo;
-
-  $: opacity = debt.is_paid ? 0.5 : 1;
 
   let shouldDelete = false;
   let isDeleteModalOpen = false;
@@ -38,34 +38,37 @@
   };
 </script>
 
-<Tile style="opacity: {opacity};">
-  <h3>{debt.description}</h3>
-  <p>
-    <span class="small">From:</span>
-    <span class:bold={debt.from === userFrom.id} class:green={debt.from === userFrom.id}>
-      {userFrom.text}
-    </span>
-  </p>
-  <p>
-    <span class="small">To:</span>
-    <span class:bold={debt.to === userFrom.id} class:green={debt.to === userFrom.id}>
-      {userTo.text}
-    </span>
-  </p>
-  <p><span class="small">Amount:</span> ₱{debt.amount.toFixed(2)}</p>
-  <Checkbox
-    labelText="Paid"
-    bind:checked={debt.is_paid}
-    on:change={handleCheckboxTick}
-    style="flex: 1; flex-direction: row-reverse;"
-  />
-  <Button
-    on:click={() => {
-      isDeleteModalOpen = !isDeleteModalOpen;
-    }}
-  >
-    Delete
-  </Button>
+<Tile>
+  <div class:gray={debt.is_paid}>
+    <h3>{debt.description}</h3>
+    <p>
+      <span class="small">From:</span>
+      <span class:bold={debt.from === userFrom.id} class:green={debt.from === userFrom.id}>
+        {userFrom.text}
+      </span>
+    </p>
+    <p>
+      <span class="small">To:</span>
+      <span class:bold={debt.to === userFrom.id} class:green={debt.to === userFrom.id}>
+        {userTo.text}
+      </span>
+    </p>
+    <p><span class="small">Amount:</span> ₱{debt.amount.toFixed(2)}</p>
+  </div>
+  <br />
+  <Checkbox labelText="Paid" bind:checked={debt.is_paid} on:change={handleCheckboxTick} />
+  {#if debt.is_paid}
+    <div class="absolute bottom-spacing right-spacing" transition:fade={{ duration: 100 }}>
+      <button
+        on:click={() => {
+          isDeleteModalOpen = !isDeleteModalOpen;
+        }}
+        class="display-flex border-none background-none cursor-pointer"
+      >
+        <TrashCan32 aria-label="Delete" style="scale: 75%;" />
+      </button>
+    </div>
+  {/if}
   <Modal
     bind:open={isDeleteModalOpen}
     modalHeading="Delete card"
@@ -89,6 +92,10 @@
 </Tile>
 
 <style>
+  .display-flex {
+    display: flex;
+  }
+
   .small {
     font-size: 0.875rem;
     font-weight: lighter;
@@ -100,5 +107,49 @@
 
   .green {
     color: rgb(12, 158, 90);
+  }
+
+  .gray {
+    color: #aaa;
+  }
+
+  .absolute {
+    position: absolute;
+  }
+
+  .h-full {
+    height: 100%;
+  }
+
+  .w-full {
+    width: 100%;
+  }
+
+  .top-spacing {
+    top: 0.5rem;
+  }
+
+  .bottom-spacing {
+    bottom: 1.1rem;
+  }
+
+  .right-spacing {
+    right: 0.3rem;
+  }
+
+  .left_spacing {
+    left: -1rem;
+  }
+
+  .border-none {
+    border: none;
+  }
+
+  .background-none {
+    background: none;
+  }
+
+  .cursor-pointer {
+    cursor: pointer;
   }
 </style>
