@@ -7,7 +7,7 @@
       userTo: "1"
     };
 
-    const url = `/api/debt.json?user1=${defaultUsers.userFrom}&user2=${defaultUsers.userTo}`;
+    const url = `/api/debt.json?user=${defaultUsers.userFrom}`;
     const res = await fetch(url);
     const result = await res.json();
 
@@ -53,7 +53,7 @@
   export let debts: DataWithId[];
   
   $: {
-    const url = `http://localhost:3000/api/debt.json?user1=${userFrom}&user2=${userTo}`;
+    const url = `http://localhost:3000/api/debt.json?user=${userFrom}`;
     fetch(url).then((res) => {
       if (res.ok) {
         return res.json();
