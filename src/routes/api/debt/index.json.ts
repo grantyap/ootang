@@ -18,7 +18,6 @@ export const get: RequestHandler = async (request) => {
 
 export const post: RequestHandler = async (request) => {
   const data = request.body.valueOf() as Data;
-  console.debug(`[/api/debt/index.ts] ${JSON.stringify(data)}`);
   addDebt(data);
 
   return {

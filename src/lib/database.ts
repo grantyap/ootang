@@ -36,7 +36,6 @@ export function getDebtsOfUsers(userOneId: string, userTwoId: string): DataWithI
     }
     return false;
   }).value();
-  console.debug(`[database.ts] ${JSON.stringify(results)}`);
   return results;
 }
 
