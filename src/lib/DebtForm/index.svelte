@@ -16,18 +16,14 @@
   };
 
   export let users: User[];
-  export let userFrom: string;
-  export let userTo: string;
-
-  $: isFromAndToSame = userFrom === userTo;
 
   let userFromIndex = 0;
   let userToIndex = 1;
 
-  $: {
-    userFrom = users[userFromIndex].id;
-    userTo = users[userToIndex].id;
-  }
+  $: isFromAndToSame = userFromIndex === userToIndex;
+
+  $: userFrom = users[userFromIndex].id;
+  $: userTo = users[userToIndex].id;
 
   let moneyOwedValue = 0;
 
@@ -75,7 +71,13 @@
   <Row>
     <Column md={4}>
       <FormGroup>
-        <Dropdown id="from" titleText="From" bind:selectedIndex={userFromIndex} items={users} />
+        <Dropdown
+          id="from"
+          titleText="From"
+          bind:selectedIndex={userFromIndex}
+          items={users}
+          on:select
+        />
       </FormGroup>
     </Column>
     <Column md={4}>

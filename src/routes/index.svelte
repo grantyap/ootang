@@ -54,21 +54,12 @@
   export let debts: DataWithId[];
 
   // FIXME: Probably cache these results.
-  const fetchDebtsFromDatabase = async (user: string) => {
+  const fetchDebtsFromDatabase = (user: string) => {
     const url = `http://localhost:3000/api/debt.json?user=${user}`;
-    await fetch(url)
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        debts = data;
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    fetch(url).then(async (res) => {
+      debts = await res.json();
+    });
   };
-
-  $: fetchDebtsFromDatabase(userFrom);
 
   const handleDebtDelete = (e) => {
     debts = debts.filter((d) => d.id !== e.detail);
@@ -81,9 +72,12 @@
   <Grid>
     <DebtForm
       users={people}
-      bind:userFrom
-      bind:userTo
-      on:submit={fetchDebtsFromDatabase(userFrom)}
+      on:submit={() => {
+        fetchDebtsFromDatabase(userFrom);
+      }}
+      on:select={(e) => {
+        fetchDebtsFromDatabase(e.detail.selectedItem.id);
+      }}
     />
     {#if debts.length === 0}
       <Row>

@@ -1,6 +1,11 @@
 <script lang="ts">
   import type { DataWithId } from "$lib/database";
 
+  type User = {
+    id: string;
+    text: string;
+  };
+
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
   import { Tile, Checkbox, Modal } from "carbon-components-svelte";
@@ -9,8 +14,8 @@
   const dispatch = createEventDispatcher();
 
   export let debt: DataWithId;
-  export let userFrom;
-  export let userTo;
+  export let userFrom: User;
+  export let userTo: User;
 
   let shouldDelete = false;
   let isDeleteModalOpen = false;
