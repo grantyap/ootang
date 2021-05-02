@@ -69,6 +69,10 @@
   };
 
   $: fetchDebtsFromDatabase(userFrom);
+  
+  const handleDebtDelete = (e) => {
+    debts = debts.filter((d) => d.id !== e.detail);
+  }
 </script>
 
 <Header company="Ootang" platformName="IOU Tracker" />
@@ -95,6 +99,7 @@
               bind:debt
               userFrom={people.find((p) => p.id === debt.from)}
               userTo={people.find((p) => p.id === debt.to)}
+              on:debtDelete={handleDebtDelete}
             />
           </Column>
         {/each}

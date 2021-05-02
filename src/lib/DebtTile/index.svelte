@@ -1,7 +1,10 @@
 <script lang="ts">
   import type { DataWithId } from "$lib/database";
 
-  import { Tile, Checkbox } from "carbon-components-svelte";
+  import { createEventDispatcher } from "svelte";
+  import { Tile, Checkbox, Button } from "carbon-components-svelte";
+  
+  const dispatch = createEventDispatcher();
 
   export let debt: DataWithId;
   export let userFrom;
@@ -9,7 +12,7 @@
 
   $: opacity = debt.is_paid ? 0.5 : 1;
 
-  const handleOnChange = () => {
+  const handleCheckboxTick = () => {
     // NOTE: on:change seems to happen before Svelte can update
     //       the binded variable. This means that if we untick
     //       the checkbox, `debt.is_paid` is still true by the
@@ -18,10 +21,16 @@
     const queryString = !debt.is_paid ? `?is_paid` : "";
     const url = `/api/debt/${debt.id}.json${queryString}`;
     fetch(url, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json"
-      }
+      method: "PATCH"
+    });
+  };
+
+  const handleDelete = () => {
+    dispatch("debtDelete", debt.id);
+
+    const url = `/api/debt/${debt.id}.json`;
+    fetch(url, {
+      method: "DELETE"
     });
   };
 </script>
@@ -44,9 +53,10 @@
   <Checkbox
     labelText="Paid"
     bind:checked={debt.is_paid}
-    on:change={handleOnChange}
+    on:change={handleCheckboxTick}
     style="flex: 1; flex-direction: row-reverse;"
   />
+  <Button on:click={handleDelete}>Delete</Button>
 </Tile>
 
 <style>

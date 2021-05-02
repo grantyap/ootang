@@ -13,7 +13,7 @@ export type Data = {
 };
 
 export type DataWithId = {
-  id: string,
+  id: string;
   from: string;
   to: string;
   amount: number;
@@ -49,4 +49,6 @@ export function updateDebt(id: string, is_paid: boolean): void {
     .find({ id: id })
     .assign({ is_paid: is_paid })
     .write();
+export function deleteDebt(id: string): void {
+  db.get("debts").remove({ id: id }).write();
 }
