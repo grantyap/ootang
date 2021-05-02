@@ -7,7 +7,7 @@
       userTo: "1"
     };
 
-    const url = `/api/debt.json?user1=${defaultUsers.userFrom}&user2=${defaultUsers.userTo}`;
+    const url = `/api/debt.json?user=${defaultUsers.userFrom}`;
     const res = await fetch(url);
     const result = await res.json();
 
@@ -29,8 +29,9 @@
 </script>
 
 <script lang="ts">
-  import { Header, Content, Grid, Row, Column, Tile } from "carbon-components-svelte";
+  import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
   import DebtForm from "$lib/DebtForm/index.svelte";
+  import DebtTile from "$lib/DebtTile/index.svelte";
   import type { DataWithId } from "$lib/database";
 
   const people = [
@@ -51,39 +52,36 @@
   export let userFrom: string;
   export let userTo: string;
   export let debts: DataWithId[];
-  
-  $: {
-    const url = `http://localhost:3000/api/debt.json?user1=${userFrom}&user2=${userTo}`;
-    fetch(url).then((res) => {
-      if (res.ok) {
-        return res.json();
-      } else {
-        throw new Error(`Could not load ${url}`);
-      }
-    }).then((data) => {
-      debts = data;
-    }).catch((err) => {
-      console.error(err);
-    });
-  }
+
+  // FIXME: Probably cache these results.
+  const fetchDebtsFromDatabase = async (user: string) => {
+    const url = `/api/debt.json?user=${user}`;
+    const res = await fetch(url).then((res) => res.json());
+    debts = res;
+  };
+
+  const handleDebtDelete = (e) => {
+    debts = debts.filter((d) => d.id !== e.detail);
+  };
 </script>
 
 <Header company="Ootang" platformName="IOU Tracker" />
 
 <Content>
   <Grid>
-    <DebtForm users={people} bind:userFrom bind:userTo />
-    <Row padding>
-      <Column>
-        <code>{JSON.stringify(debts)}</code>
-      </Column>
-    </Row>
-    <Row padding>
-      <Column>
-        <p>userFrom: {userFrom}</p>
-        <p>userTo: {userTo}</p>
-      </Column>
-    </Row>
+    <DebtForm
+      users={people}
+      on:submit={() => {
+        fetchDebtsFromDatabase(userFrom);
+      }}
+      on:click={() => {
+        fetchDebtsFromDatabase(userFrom);
+      }}
+      on:select={(e) => {
+        userFrom = e.detail.selectedItem.id;
+        fetchDebtsFromDatabase(userFrom);
+      }}
+    />
     {#if debts.length === 0}
       <Row>
         <Column>
@@ -91,20 +89,19 @@
         </Column>
       </Row>
     {:else}
-      {#each debts as debt}
-        <Row padding>
-          <Column sm={2}>
-            <Tile>
-              <h3>{debt.description}</h3>
-              <p><strong>From:</strong> {people[debt.from].text}</p>
-              <p><strong>To:</strong> {people[debt.to].text}</p>
-              <p><strong>Amount:</strong> ₱{debt.amount.toFixed(2)}</p>
-              <p><strong>Description:</strong> {debt.description}</p>
-              <p><strong>Was paid</strong>: {debt.is_paid}</p>
-            </Tile>
+      <Row padding>
+        {#each debts as debt (debt.id)}
+          <Column sm={2} md={3}>
+            <DebtTile
+              bind:debt
+              currentUser={people.find((p) => p.id === userFrom)}
+              userFrom={people.find((p) => p.id === debt.from)}
+              userTo={people.find((p) => p.id === debt.to)}
+              on:debtDelete={handleDebtDelete}
+            />
           </Column>
-        </Row>
-      {/each}
+        {/each}
+      </Row>
     {/if}
   </Grid>
 </Content>

@@ -7,8 +7,7 @@
     TextInput,
     Form,
     FormGroup,
-    Select,
-    SelectItem
+    Dropdown
   } from "carbon-components-svelte";
 
   type User = {
@@ -17,10 +16,14 @@
   };
 
   export let users: User[];
-  export let userFrom: string;
-  export let userTo: string;
 
-  $: isFromAndToSame = userFrom === userTo;
+  let userFromIndex = 0;
+  let userToIndex = 1;
+
+  $: isFromAndToSame = userFromIndex === userToIndex;
+
+  $: userFrom = users[userFromIndex].id;
+  $: userTo = users[userToIndex].id;
 
   let moneyOwedValue = 0;
 
@@ -33,16 +36,18 @@
       `₱${moneyOwedValue.toFixed(2)}`;
 
   let description = "";
-  
+
   const clearForm = () => {
     moneyOwedValue = 0;
     description = "";
   };
 
+  // FIXME: Cache newly added entry, there's no need to
+  //        refetch from the database.
   const handleOnSubmit = async (e) => {
     e.preventDefault();
 
-    const entry = {
+    e.detail = {
       from: userFrom,
       to: userTo,
       amount: moneyOwedValue,
@@ -55,38 +60,36 @@
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(entry)
+      body: JSON.stringify(e.detail)
     }).then(() => {
       clearForm();
     });
   };
 </script>
 
-<Form on:submit={handleOnSubmit}>
+<Form on:submit={handleOnSubmit} on:submit>
   <Row>
     <Column md={4}>
       <FormGroup>
-        <Select id="from" labelText="From" value={users[0].text} bind:selected={userFrom}>
-          {#each users as user (user.id)}
-            <SelectItem value={user.id} text={user.text} />
-          {/each}
-        </Select>
+        <Dropdown
+          id="from"
+          titleText="From"
+          bind:selectedIndex={userFromIndex}
+          items={users}
+          on:select
+        />
       </FormGroup>
     </Column>
     <Column md={4}>
       <FormGroup>
-        <Select
+        <Dropdown
           id="to"
-          labelText="To"
-          value={users[1].text}
-          bind:selected={userTo}
+          titleText="To"
+          bind:selectedIndex={userToIndex}
+          items={users}
           invalid={isFromAndToSame}
           invalidText="You can't owe yourself!"
-        >
-          {#each users as user (user.id)}
-            <SelectItem value={user.id} text={user.text} />
-          {/each}
-        </Select>
+        />
       </FormGroup>
     </Column>
   </Row>
@@ -116,7 +119,7 @@
   </Row>
   <Row padding>
     <Column style="text-align: right;">
-      <Button type="submit" disabled={isFromAndToSame}>Add</Button>
+      <Button type="submit" disabled={isFromAndToSame} on:click>Add</Button>
     </Column>
   </Row>
 </Form>
