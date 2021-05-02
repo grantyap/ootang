@@ -12,13 +12,31 @@ export type Data = {
   is_paid: boolean;
 };
 
+type DataWithId = {
+  id: string,
+  from: string;
+  to: string;
+  amount: number;
+  description: string;
+  is_paid: boolean;
+};
+
 db.defaults({
   debts: [],
   count: 0
 }).write();
 
-export function getDebtsOfUsers(userOneId: string, userTwoId: string): void {
-  const results = db.get("debts").find({ from: userOneId, to: userTwoId }).value();
+export function getDebtsOfUsers(userOneId: string, userTwoId: string): DataWithId[] {
+  const results = db.get("debts").filter((entry: DataWithId) => {
+    if (entry.from === userOneId && entry.to === userTwoId) {
+      return true;
+    }
+    if (entry.to === userOneId && entry.from === userTwoId) {
+      return true;
+    }
+    return false;
+  }).value();
+  console.debug(`[database.ts] ${JSON.stringify(results)}`);
   return results;
 }
 
