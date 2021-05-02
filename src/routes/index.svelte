@@ -9,9 +9,16 @@
 
     const url = `/api/debt.json?user1=${defaultUsers.userFrom}&user2=${defaultUsers.userTo}`;
     const res = await fetch(url);
+    const result = await res.json();
 
     if (res.ok) {
-      return {};
+      return {
+        props: {
+          userFrom: defaultUsers.userFrom,
+          userTo: defaultUsers.userTo,
+          debts: result
+        }
+      };
     }
 
     return {
@@ -22,8 +29,9 @@
 </script>
 
 <script lang="ts">
-  import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
+  import { Header, Content, Grid, Row, Column, Tile } from "carbon-components-svelte";
   import DebtForm from "$lib/DebtForm/index.svelte";
+  import type { DataWithId } from "$lib/database";
 
   const people = [
     {
@@ -40,8 +48,24 @@
     }
   ];
 
-  let userFrom = "0";
-  let userTo = "1";
+  export let userFrom: string;
+  export let userTo: string;
+  export let debts: DataWithId[];
+  
+  $: {
+    const url = `http://localhost:3000/api/debt.json?user1=${userFrom}&user2=${userTo}`;
+    fetch(url).then((res) => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        throw new Error(`Could not load ${url}`);
+      }
+    }).then((data) => {
+      debts = data;
+    }).catch((err) => {
+      console.error(err);
+    });
+  }
 </script>
 
 <Header company="Ootang" platformName="IOU Tracker" />
@@ -51,9 +75,36 @@
     <DebtForm users={people} bind:userFrom bind:userTo />
     <Row padding>
       <Column>
-        <code>userFrom: {userFrom}, type {typeof userFrom}</code><br />
-        <code>userTo: {userTo}, type {typeof userTo}</code>
+        <code>{JSON.stringify(debts)}</code>
       </Column>
     </Row>
+    <Row padding>
+      <Column>
+        <p>userFrom: {userFrom}</p>
+        <p>userTo: {userTo}</p>
+      </Column>
+    </Row>
+    {#if debts.length === 0}
+      <Row>
+        <Column>
+          <p>Nothing to pay ✨</p>
+        </Column>
+      </Row>
+    {:else}
+      {#each debts as debt}
+        <Row padding>
+          <Column sm={2}>
+            <Tile>
+              <h3>{debt.description}</h3>
+              <p><strong>From:</strong> {people[debt.from].text}</p>
+              <p><strong>To:</strong> {people[debt.to].text}</p>
+              <p><strong>Amount:</strong> ₱{debt.amount.toFixed(2)}</p>
+              <p><strong>Description:</strong> {debt.description}</p>
+              <p><strong>Was paid</strong>: {debt.is_paid}</p>
+            </Tile>
+          </Column>
+        </Row>
+      {/each}
+    {/if}
   </Grid>
 </Content>

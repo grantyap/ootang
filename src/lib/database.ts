@@ -12,7 +12,7 @@ export type Data = {
   is_paid: boolean;
 };
 
-type DataWithId = {
+export type DataWithId = {
   id: string,
   from: string;
   to: string;

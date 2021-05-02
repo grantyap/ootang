@@ -12,7 +12,7 @@ export const get: RequestHandler = async (request) => {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(debts)
+    body: debts
   };
 };
 
