@@ -33,20 +33,36 @@
       `₱${moneyOwedValue.toFixed(2)}`;
 
   let description = "";
-</script>
+  
+  const clearForm = () => {
+    moneyOwedValue = 0;
+    description = "";
+  };
 
-<Form
-  on:submit={() => {
+  const handleOnSubmit = async (e) => {
+    e.preventDefault();
+
     const entry = {
       from: userFrom,
       to: userTo,
       amount: moneyOwedValue,
-      description: description
+      description: description,
+      is_paid: false
     };
 
-    console.debug(entry);
-  }}
->
+    const res = await fetch(`/api/debt.json`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(entry)
+    }).then(() => {
+      clearForm();
+    });
+  };
+</script>
+
+<Form on:submit={handleOnSubmit}>
   <Row>
     <Column md={4}>
       <FormGroup>
