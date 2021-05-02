@@ -39,10 +39,12 @@
     description = "";
   };
 
+  // FIXME: Cache newly added entry, there's no need to
+  //        refetch from the database.
   const handleOnSubmit = async (e) => {
     e.preventDefault();
 
-    const entry = {
+    e.detail = {
       from: userFrom,
       to: userTo,
       amount: moneyOwedValue,
@@ -55,14 +57,14 @@
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(entry)
+      body: JSON.stringify(e.detail)
     }).then(() => {
       clearForm();
     });
   };
 </script>
 
-<Form on:submit={handleOnSubmit}>
+<Form on:submit={handleOnSubmit} on:submit>
   <Row>
     <Column md={4}>
       <FormGroup>

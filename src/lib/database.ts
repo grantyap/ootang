@@ -26,12 +26,9 @@ db.defaults({
   count: 0
 }).write();
 
-export function getDebtsOfUsers(userOneId: string, userTwoId: string): DataWithId[] {
+export function getDebtsOfUser(userId: string): DataWithId[] {
   const results = db.get("debts").filter((entry: DataWithId) => {
-    if (entry.from === userOneId && entry.to === userTwoId) {
-      return true;
-    }
-    if (entry.to === userOneId && entry.from === userTwoId) {
+    if (entry.from === userId || entry.to === userId) {
       return true;
     }
     return false;
