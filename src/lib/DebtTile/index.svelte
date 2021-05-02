@@ -49,7 +49,7 @@
     <h3>{debt.description}</h3>
     <p>
       <span class="small">From:</span>
-      <span class:bold={debt.from === currentUser.id} class:green={debt.from === currentUser.id}>
+      <span class:bold={debt.from === currentUser.id} class:red={debt.from === currentUser.id}>
         {userFrom.text}
       </span>
     </p>
@@ -113,6 +113,10 @@
 
   .green {
     color: rgb(12, 158, 90);
+  }
+  
+  .red {
+    color: rgb(243, 19, 3);
   }
 
   .gray {
