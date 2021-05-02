@@ -43,3 +43,10 @@ export function addDebt(data: Data): void {
     .write();
   db.set("count", lastCount + 1).write();
 }
+
+export function updateDebt(id: string, is_paid: boolean): void {
+  db.get("debts")
+    .find({ id: id })
+    .assign({ is_paid: is_paid })
+    .write();
+}

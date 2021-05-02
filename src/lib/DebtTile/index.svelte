@@ -1,13 +1,29 @@
 <script lang="ts">
+  import type { DataWithId } from "$lib/database";
+
   import { Tile, Checkbox } from "carbon-components-svelte";
 
-  export let debt;
+  export let debt: DataWithId;
   export let userFrom;
   export let userTo;
 
-  let checked = false;
-  
-  $: opacity = checked ? 0.5 : 1;
+  $: opacity = debt.is_paid ? 0.5 : 1;
+
+  const handleOnChange = () => {
+    // NOTE: on:change seems to happen before Svelte can update
+    //       the binded variable. This means that if we untick
+    //       the checkbox, `debt.is_paid` is still true by the
+    //       time we enter this callback.
+    //       Thus, we check NOT `debt.is_paid`.
+    const queryString = !debt.is_paid ? `?is_paid` : "";
+    const url = `/api/debt/${debt.id}.json${queryString}`;
+    fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+  };
 </script>
 
 <Tile style="opacity: {opacity};">
@@ -25,7 +41,12 @@
     </span>
   </p>
   <p><span class="small">Amount:</span> ₱{debt.amount.toFixed(2)}</p>
-  <Checkbox labelText="Paid" bind:checked style="flex: 1; flex-direction: row-reverse;" />
+  <Checkbox
+    labelText="Paid"
+    bind:checked={debt.is_paid}
+    on:change={handleOnChange}
+    style="flex: 1; flex-direction: row-reverse;"
+  />
 </Tile>
 
 <style>
