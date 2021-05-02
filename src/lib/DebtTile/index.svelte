@@ -2,8 +2,8 @@
   import type { DataWithId } from "$lib/database";
 
   import { createEventDispatcher } from "svelte";
-  import { Tile, Checkbox, Button } from "carbon-components-svelte";
-  
+  import { Tile, Checkbox, Button, Modal } from "carbon-components-svelte";
+
   const dispatch = createEventDispatcher();
 
   export let debt: DataWithId;
@@ -11,6 +11,9 @@
   export let userTo;
 
   $: opacity = debt.is_paid ? 0.5 : 1;
+
+  let shouldDelete = false;
+  let isDeleteModalOpen = false;
 
   const handleCheckboxTick = () => {
     // NOTE: on:change seems to happen before Svelte can update
@@ -56,7 +59,33 @@
     on:change={handleCheckboxTick}
     style="flex: 1; flex-direction: row-reverse;"
   />
-  <Button on:click={handleDelete}>Delete</Button>
+  <Button
+    on:click={() => {
+      isDeleteModalOpen = !isDeleteModalOpen;
+    }}
+  >
+    Delete
+  </Button>
+  <Modal
+    bind:open={isDeleteModalOpen}
+    modalHeading="Delete card"
+    primaryButtonText="Delete"
+    secondaryButtonText="Cancel"
+    on:click:button--secondary={() => {
+      isDeleteModalOpen = !isDeleteModalOpen;
+    }}
+    on:submit={() => {
+      shouldDelete = true;
+      isDeleteModalOpen = !isDeleteModalOpen;
+    }}
+    on:transitionend={() => {
+      if (shouldDelete) {
+        handleDelete();
+      }
+    }}
+  >
+    Are you sure you want to delete {debt.description ? `"${debt.description}"` : "this card"}?
+  </Modal>
 </Tile>
 
 <style>
