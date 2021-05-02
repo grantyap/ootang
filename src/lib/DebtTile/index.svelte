@@ -46,7 +46,7 @@
 
 <Tile>
   <div class:gray={debt.is_paid}>
-    <h3>{debt.description}</h3>
+    <h4 class="bold">{debt.description}</h4>
     <p>
       <span class="small">From:</span>
       <span class:bold={debt.from === currentUser.id} class:red={debt.from === currentUser.id}>
@@ -71,7 +71,7 @@
         }}
         class="display-flex border-none background-none cursor-pointer"
       >
-        <TrashCan32 aria-label="Delete" style="scale: 75%;" />
+        <TrashCan32 aria-label="Delete" style="width: 1.45rem; height: 1.45rem;" />
       </button>
     </div>
   {/if}
@@ -114,7 +114,7 @@
   .green {
     color: rgb(12, 158, 90);
   }
-  
+
   .red {
     color: rgb(243, 19, 3);
   }
@@ -128,11 +128,11 @@
   }
 
   .bottom-spacing {
-    bottom: 1.1rem;
+    bottom: 1.4rem;
   }
 
   .right-spacing {
-    right: 0.3rem;
+    right: 0.7rem;
   }
 
   .border-none {
