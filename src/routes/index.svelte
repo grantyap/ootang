@@ -1,3 +1,30 @@
+<script context="module" lang="ts">
+  import type { Load } from "@sveltejs/kit";
+
+  export const load: Load = async ({ fetch }) => {
+    const defaultUsers = {
+      userFrom: "0",
+      userTo: "1"
+    };
+
+    const url = `/api/debt/${defaultUsers.userFrom}-${defaultUsers.userTo}.json`;
+    const res = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (res.ok) {
+      return {};
+    }
+
+    return {
+      status: res.status,
+      error: new Error(`Could not load ${url}`)
+    };
+  };
+</script>
+
 <script lang="ts">
   import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
   import DebtForm from "$lib/DebtForm/index.svelte";

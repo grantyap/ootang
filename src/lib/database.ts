@@ -19,7 +19,7 @@ db.defaults({
 
 export function getDebtsOfUsers(userOneId: string, userTwoId: string): void {
   const results = db.get("debts").find({ from: userOneId, to: userTwoId }).value();
-  console.debug(results);
+  return results;
 }
 
 export function addDebt(data: Data): void {
