@@ -3,7 +3,7 @@
 
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
-  import { Row, Column, Tile, Checkbox, Modal } from "carbon-components-svelte";
+  import { Tile, Checkbox, Modal } from "carbon-components-svelte";
   import { TrashCan32 } from "carbon-icons-svelte";
 
   const dispatch = createEventDispatcher();
@@ -117,28 +117,12 @@
     position: absolute;
   }
 
-  .h-full {
-    height: 100%;
-  }
-
-  .w-full {
-    width: 100%;
-  }
-
-  .top-spacing {
-    top: 0.5rem;
-  }
-
   .bottom-spacing {
     bottom: 1.1rem;
   }
 
   .right-spacing {
     right: 0.3rem;
-  }
-
-  .left_spacing {
-    left: -1rem;
   }
 
   .border-none {

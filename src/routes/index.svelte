@@ -29,7 +29,7 @@
 </script>
 
 <script lang="ts">
-  import { Header, Content, Grid, Row, Column, Tile } from "carbon-components-svelte";
+  import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
   import DebtForm from "$lib/DebtForm/index.svelte";
   import DebtTile from "$lib/DebtTile/index.svelte";
   import type { DataWithId } from "$lib/database";
