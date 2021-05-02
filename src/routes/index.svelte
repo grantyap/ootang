@@ -94,7 +94,7 @@
     {:else}
       <Row padding>
         {#each debts as debt (debt.id)}
-          <Column sm={4} md={2}>
+          <Column sm={2} md={3}>
             <DebtTile
               bind:debt
               userFrom={people.find((p) => p.id === debt.from)}
