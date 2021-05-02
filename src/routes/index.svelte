@@ -51,28 +51,30 @@
   export let userFrom: string;
   export let userTo: string;
   export let debts: DataWithId[];
-  
-  $: {
-    const url = `http://localhost:3000/api/debt.json?user=${userFrom}`;
-    fetch(url).then((res) => {
-      if (res.ok) {
+
+  // FIXME: Probably cache these results.
+  const fetchDebtsFromDatabase = async (user: string) => {
+    const url = `http://localhost:3000/api/debt.json?user=${user}`;
+    await fetch(url)
+      .then((res) => {
         return res.json();
-      } else {
-        throw new Error(`Could not load ${url}`);
-      }
-    }).then((data) => {
-      debts = data;
-    }).catch((err) => {
-      console.error(err);
-    });
-  }
+      })
+      .then((data) => {
+        debts = data;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
+  $: fetchDebtsFromDatabase(userFrom);
 </script>
 
 <Header company="Ootang" platformName="IOU Tracker" />
 
 <Content>
   <Grid>
-    <DebtForm users={people} bind:userFrom bind:userTo />
+    <DebtForm users={people} bind:userFrom bind:userTo on:submit={fetchDebtsFromDatabase(userFrom)}/>
     <Row padding>
       <Column>
         <code>{JSON.stringify(debts)}</code>
