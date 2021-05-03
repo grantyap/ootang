@@ -19,7 +19,7 @@
     property="og:description"
     content="Never forget about the money your friend owes you with Ootang."
   />
-  <meta property="og:image" content="https://ootang.vercel.app/meta_card.png" />
+  <meta property="og:image:secure_url" content="https://ootang.vercel.app/meta_card.png" />
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image" />
