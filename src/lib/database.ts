@@ -1,22 +1,22 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 export type User = {
-  _id: string;
+  _id: ObjectId;
   name: string;
 };
 
 export type DebtWithId = {
-  _id: string;
-  debtor_id: string;
-  debtee_id: string;
+  _id: ObjectId;
+  debtor_id: ObjectId;
+  debtee_id: ObjectId;
   amount: number;
   description: string;
   is_paid: boolean;
 };
 
 export type Debt = {
-  debtor_id: string;
-  debtee_id: string;
+  debtor_id: ObjectId;
+  debtee_id: ObjectId;
   amount: number;
   description: string;
   is_paid: boolean;
@@ -53,10 +53,10 @@ export async function getDebtsOfUser(userId: string): Promise<DebtWithId[]> {
     .find({
       $or: [
         {
-          debtor_id: userId
+          debtor_id: ObjectId(userId)
         },
         {
-          debtee_id: userId
+          debtee_id: ObjectId(userId)
         }
       ]
     })
@@ -66,6 +66,9 @@ export async function getDebtsOfUser(userId: string): Promise<DebtWithId[]> {
 }
 
 export async function addDebt(data: Debt): Promise<void> {
+  data.debtor_id = ObjectId(data.debtor_id);
+  data.debtee_id = ObjectId(data.debtee_id);
+
   const db = await getDb();
   await db.collection("debts").insertOne(data);
 }
@@ -73,9 +76,10 @@ export async function addDebt(data: Debt): Promise<void> {
 export async function updateDebt(debtId: string, isPaid: boolean): Promise<void> {
   const db = await getDb();
 
-  const filter = { _id: debtId };
+  const filter = { _id: ObjectId(debtId) };
+  const findResult = await db.collection("debts").findOne(filter);
 
-  await db.collection("debts").update(filter, {
+  await db.collection("debts").updateOne(filter, {
     $set: {
       is_paid: isPaid
     }
@@ -84,5 +88,5 @@ export async function updateDebt(debtId: string, isPaid: boolean): Promise<void>
 
 export async function deleteDebt(debtId: string): Promise<void> {
   const db = await getDb();
-  await db.collection("debts").deleteOne({ _id: debtId });
+  await db.collection("debts").deleteOne({ _id: ObjectId(debtId) });
 }
