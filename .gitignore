@@ -5,3 +5,4 @@ node_modules
 /functions
 db.json
 /.vercel_build_output
+.env.local

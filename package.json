@@ -27,6 +27,6 @@
   },
   "type": "module",
   "dependencies": {
-    "lowdb": "^1.0.0"
+    "mongodb": "^3.6.6"
   }
 }

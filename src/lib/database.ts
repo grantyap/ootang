@@ -1,56 +1,92 @@
-import low from "lowdb";
-import FileSync from "lowdb/adapters/FileSync.js";
+import { MongoClient, ObjectId } from "mongodb";
 
-const adapter = new FileSync("db.json");
-const db = low(adapter);
+export type User = {
+  _id: ObjectId;
+  name: string;
+};
 
-export type Data = {
-  from: string;
-  to: string;
+export type DebtWithId = {
+  _id: ObjectId;
+  debtor_id: ObjectId;
+  debtee_id: ObjectId;
   amount: number;
   description: string;
   is_paid: boolean;
 };
 
-export type DataWithId = {
-  id: string;
-  from: string;
-  to: string;
+export type Debt = {
+  debtor_id: ObjectId;
+  debtee_id: ObjectId;
   amount: number;
   description: string;
   is_paid: boolean;
 };
 
-db.defaults({
-  debts: [],
-  count: 0
-}).write();
+let cachedDb = null;
 
-export function getDebtsOfUser(userId: string): DataWithId[] {
-  const results = db
-    .get("debts")
-    .filter((entry: DataWithId) => {
-      if (entry.from === userId || entry.to === userId) {
-        return true;
-      }
-      return false;
+async function getDb() {
+  const uri = import.meta.env.VITE_MONGODB_URI;
+
+  if (cachedDb) {
+    return cachedDb;
+  }
+
+  const client = await MongoClient.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  });
+  const db = await client.db("ootang");
+
+  cachedDb = db;
+  return db;
+}
+
+export async function getUsers(): Promise<User[]> {
+  const db = await getDb();
+  return await db.collection("users").find().toArray();
+}
+
+export async function getDebtsOfUser(userId: string): Promise<DebtWithId[]> {
+  const db = await getDb();
+  const debts: DebtWithId[] = await db
+    .collection("debts")
+    .find({
+      $or: [
+        {
+          debtor_id: ObjectId(userId)
+        },
+        {
+          debtee_id: ObjectId(userId)
+        }
+      ]
     })
-    .value();
-  return results;
+    .toArray();
+
+  return debts;
 }
 
-export function addDebt(data: Data): void {
-  const lastCount = db.get("count").value();
-  db.get("debts")
-    .push({ id: String(lastCount), ...data })
-    .write();
-  db.set("count", lastCount + 1).write();
+export async function addDebt(data: Debt): Promise<void> {
+  data.debtor_id = ObjectId(data.debtor_id);
+  data.debtee_id = ObjectId(data.debtee_id);
+
+  const db = await getDb();
+  await db.collection("debts").insertOne(data);
 }
 
-export function updateDebt(id: string, is_paid: boolean): void {
-  db.get("debts").find({ id: id }).assign({ is_paid: is_paid }).write();
+export async function updateDebt(debtId: string, isPaid: boolean): Promise<void> {
+  const db = await getDb();
+
+  const filter = { _id: ObjectId(debtId) };
+  const findResult = await db.collection("debts").findOne(filter);
+
+  await db.collection("debts").updateOne(filter, {
+    $set: {
+      is_paid: isPaid
+    }
+  });
 }
 
-export function deleteDebt(id: string): void {
-  db.get("debts").remove({ id: id }).write();
+export async function deleteDebt(debtId: string): Promise<void> {
+  const db = await getDb();
+  await db.collection("debts").deleteOne({ _id: ObjectId(debtId) });
 }

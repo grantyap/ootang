@@ -1,10 +1,5 @@
 <script lang="ts">
-  import type { DataWithId } from "$lib/database";
-
-  type User = {
-    id: string;
-    text: string;
-  };
+  import type { User, DebtWithId } from "$lib/database";
 
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
@@ -13,7 +8,7 @@
 
   const dispatch = createEventDispatcher();
 
-  export let debt: DataWithId;
+  export let debt: DebtWithId;
   export let currentUser: User = null;
   export let userFrom: User;
   export let userTo: User;
@@ -28,16 +23,16 @@
     //       time we enter this callback.
     //       Thus, we check NOT `debt.is_paid`.
     const queryString = !debt.is_paid ? `?is_paid` : "";
-    const url = `/api/debt/${debt.id}.json${queryString}`;
+    const url = `/api/debt/${debt._id}.json${queryString}`;
     fetch(url, {
       method: "PATCH"
     });
   };
 
   const handleDelete = () => {
-    dispatch("debtDelete", debt.id);
+    dispatch("debtDelete", debt._id);
 
-    const url = `/api/debt/${debt.id}.json`;
+    const url = `/api/debt/${debt._id}.json`;
     fetch(url, {
       method: "DELETE"
     });
@@ -49,14 +44,20 @@
     <h4 class="bold">{debt.description}</h4>
     <p>
       <span class="small">From:</span>
-      <span class:bold={debt.from === currentUser.id} class:red={debt.from === currentUser.id}>
-        {userFrom.text}
+      <span
+        class:bold={debt.debtor_id === currentUser._id}
+        class:red={debt.debtor_id === currentUser._id}
+      >
+        {userFrom.name}
       </span>
     </p>
     <p>
       <span class="small">To:</span>
-      <span class:bold={debt.to === currentUser.id} class:green={debt.to === currentUser.id}>
-        {userTo.text}
+      <span
+        class:bold={debt.debtee_id === currentUser._id}
+        class:green={debt.debtee_id === currentUser._id}
+      >
+        {userTo.name}
       </span>
     </p>
     <p><span class="small">Amount:</span> ₱{debt.amount.toFixed(2)}</p>
