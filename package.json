@@ -28,5 +28,6 @@
   "type": "module",
   "dependencies": {
     "mongodb": "^3.6.6"
-  }
+  },
+  "postinstall": "npx patch-package"
 }
