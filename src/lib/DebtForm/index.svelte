@@ -9,11 +9,7 @@
     FormGroup,
     Dropdown
   } from "carbon-components-svelte";
-
-  type User = {
-    id: string;
-    text: string;
-  };
+  import type { User } from "$lib/database";
 
   export let users: User[];
 
@@ -22,20 +18,19 @@
 
   $: isFromAndToSame = userFromIndex === userToIndex;
 
-  $: userFrom = users[userFromIndex].id;
-  $: userTo = users[userToIndex].id;
-
   let moneyOwedValue = 0;
 
   $: moneyOwedString = isFromAndToSame
     ? ""
-    : `${users[userFrom].text}` +
+    : `${users[userFromIndex].name}` +
       " will owe " +
-      `${users[userTo].text}` +
+      `${users[userToIndex].name}` +
       " " +
       `₱${moneyOwedValue.toFixed(2)}`;
 
   let description = "";
+
+  $: dropdownItems = users.map((u) => ({ id: u._id, text: u.name }));
 
   const clearForm = () => {
     moneyOwedValue = 0;
@@ -48,8 +43,8 @@
     e.preventDefault();
 
     e.detail = {
-      from: userFrom,
-      to: userTo,
+      debtor_id: users[userFromIndex]._id,
+      debtee_id: users[userToIndex]._id,
       amount: moneyOwedValue,
       description: description,
       is_paid: false
@@ -75,7 +70,7 @@
           id="from"
           titleText="From"
           bind:selectedIndex={userFromIndex}
-          items={users}
+          items={dropdownItems}
           on:select
         />
       </FormGroup>
@@ -86,7 +81,7 @@
           id="to"
           titleText="To"
           bind:selectedIndex={userToIndex}
-          items={users}
+          items={dropdownItems}
           invalid={isFromAndToSame}
           invalidText="You can't owe yourself!"
         />

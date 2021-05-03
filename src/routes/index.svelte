@@ -1,21 +1,22 @@
 <script context="module" lang="ts">
   import type { Load } from "@sveltejs/kit";
+  import type { User } from "$lib/database";
 
   export const load: Load = async ({ fetch }) => {
-    const defaultUsers = {
-      userFrom: "0",
-      userTo: "1"
-    };
+    const users: User[] = await fetch(`/api/users.json`).then((res) => {
+      return res.json();
+    });
 
-    const url = `/api/debt.json?user=${defaultUsers.userFrom}`;
+    const url = `/api/debt.json?user=${users[0]._id}`;
     const res = await fetch(url);
-    const result = await res.json();
 
     if (res.ok) {
+      const result = await res.json();
       return {
         props: {
-          userFrom: defaultUsers.userFrom,
-          userTo: defaultUsers.userTo,
+          users: users,
+          userFrom: users[0]._id,
+          userTo: users[1]._id,
           debts: result
         }
       };
@@ -32,36 +33,30 @@
   import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
   import DebtForm from "$lib/DebtForm/index.svelte";
   import DebtTile from "$lib/DebtTile/index.svelte";
-  import type { DataWithId } from "$lib/database";
+  import type { DebtWithId } from "$lib/database";
 
-  const people = [
-    {
-      id: "0",
-      text: "Grant"
-    },
-    {
-      id: "1",
-      text: "Gaela"
-    },
-    {
-      id: "2",
-      text: "Daddy"
-    }
-  ];
-
+  export let users: User[];
   export let userFrom: string;
   export let userTo: string;
-  export let debts: DataWithId[];
+  export let debts: DebtWithId[];
+
+  $: {
+    // If `debts` is an empty object (like when the database is still empty),
+    // we let it be an empty array instead.
+    if (debts && Object.keys(debts).length === 0 && debts.constructor === Object) {
+      debts = [];
+    }
+  }
 
   // FIXME: Probably cache these results.
-  const fetchDebtsFromDatabase = async (user: string) => {
-    const url = `/api/debt.json?user=${user}`;
+  const fetchDebtsFromDatabase = async (userId: string) => {
+    const url = `/api/debt.json?user=${userId}`;
     const res = await fetch(url).then((res) => res.json());
     debts = res;
   };
 
   const handleDebtDelete = (e) => {
-    debts = debts.filter((d) => d.id !== e.detail);
+    debts = debts.filter((d) => d._id !== e.detail);
   };
 </script>
 
@@ -70,7 +65,7 @@
 <Content>
   <Grid>
     <DebtForm
-      users={people}
+      {users}
       on:submit={() => {
         fetchDebtsFromDatabase(userFrom);
       }}
@@ -90,13 +85,13 @@
       </Row>
     {:else}
       <Row padding>
-        {#each debts as debt (debt.id)}
+        {#each debts as debt (debt._id)}
           <Column sm={2} md={3}>
             <DebtTile
               bind:debt
-              currentUser={people.find((p) => p.id === userFrom)}
-              userFrom={people.find((p) => p.id === debt.from)}
-              userTo={people.find((p) => p.id === debt.to)}
+              currentUser={users.find((u) => u._id === userFrom)}
+              userFrom={users.find((u) => u._id === debt.debtor_id)}
+              userTo={users.find((u) => u._id === debt.debtee_id)}
               on:debtDelete={handleDebtDelete}
             />
           </Column>
