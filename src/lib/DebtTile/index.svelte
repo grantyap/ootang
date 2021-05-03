@@ -1,10 +1,5 @@
 <script lang="ts">
-  import type { DebtWithId } from "$lib/database";
-
-  type User = {
-    id: string;
-    text: string;
-  };
+  import type { User, DebtWithId } from "$lib/database";
 
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
@@ -49,14 +44,20 @@
     <h4 class="bold">{debt.description}</h4>
     <p>
       <span class="small">From:</span>
-      <span class:bold={debt.debtor_id === currentUser.id} class:red={debt.debtor_id === currentUser.id}>
-        {userFrom.text}
+      <span
+        class:bold={debt.debtor_id === currentUser._id}
+        class:red={debt.debtor_id === currentUser._id}
+      >
+        {userFrom.name}
       </span>
     </p>
     <p>
       <span class="small">To:</span>
-      <span class:bold={debt.debtee_id === currentUser.id} class:green={debt.debtee_id === currentUser.id}>
-        {userTo.text}
+      <span
+        class:bold={debt.debtee_id === currentUser._id}
+        class:green={debt.debtee_id === currentUser._id}
+      >
+        {userTo.name}
       </span>
     </p>
     <p><span class="small">Amount:</span> ₱{debt.amount.toFixed(2)}</p>
