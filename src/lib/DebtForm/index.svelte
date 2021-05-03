@@ -48,8 +48,8 @@
     e.preventDefault();
 
     e.detail = {
-      from: userFrom,
-      to: userTo,
+      debtor_id: userFrom,
+      debtee_id: userTo,
       amount: moneyOwedValue,
       description: description,
       is_paid: false
