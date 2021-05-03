@@ -15,8 +15,7 @@
       return {
         props: {
           users: users,
-          userFrom: users[0]._id,
-          userTo: users[1]._id,
+          currentUser: users[0]._id,
           debts: result
         }
       };
@@ -36,8 +35,7 @@
   import type { DebtWithId } from "$lib/database";
 
   export let users: User[];
-  export let userFrom: string;
-  export let userTo: string;
+  export let currentUser: string;
   export let debts: DebtWithId[];
 
   $: {
@@ -67,14 +65,14 @@
     <DebtForm
       {users}
       on:submit={() => {
-        fetchDebtsFromDatabase(userFrom);
+        fetchDebtsFromDatabase(currentUser);
       }}
       on:click={() => {
-        fetchDebtsFromDatabase(userFrom);
+        fetchDebtsFromDatabase(currentUser);
       }}
       on:select={(e) => {
-        userFrom = e.detail.selectedItem.id;
-        fetchDebtsFromDatabase(userFrom);
+        currentUser = e.detail.selectedItem.id;
+        fetchDebtsFromDatabase(currentUser);
       }}
     />
     {#if debts.length === 0}
@@ -89,7 +87,7 @@
           <Column sm={2} md={3}>
             <DebtTile
               bind:debt
-              currentUser={users.find((u) => u._id === userFrom)}
+              currentUser={users.find((u) => u._id === currentUser)}
               userFrom={users.find((u) => u._id === debt.debtor_id)}
               userTo={users.find((u) => u._id === debt.debtee_id)}
               on:debtDelete={handleDebtDelete}
