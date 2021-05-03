@@ -1,5 +1,10 @@
 import { MongoClient } from "mongodb";
 
+export type User = {
+  _id: string;
+  name: string;
+};
+
 export type DebtWithId = {
   _id: string;
   debtor_id: string;
@@ -34,6 +39,11 @@ async function getDb() {
 
   cachedDb = db;
   return db;
+}
+
+export async function getUsers(): Promise<User[]> {
+  const db = await getDb();
+  return await db.collection("users").find().toArray();
 }
 
 export async function getDebtsOfUser(userId: string): Promise<DebtWithId[]> {
