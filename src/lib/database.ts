@@ -1,22 +1,23 @@
-import { MongoClient, ObjectId } from "mongodb";
+import mongodb from "mongodb";
+const { MongoClient, ObjectId } = mongodb;
 
 export type User = {
-  _id: ObjectId;
+  _id: typeof ObjectId;
   name: string;
 };
 
 export type DebtWithId = {
-  _id: ObjectId;
-  debtor_id: ObjectId;
-  debtee_id: ObjectId;
+  _id: typeof ObjectId;
+  debtor_id: typeof ObjectId;
+  debtee_id: typeof ObjectId;
   amount: number;
   description: string;
   is_paid: boolean;
 };
 
 export type Debt = {
-  debtor_id: ObjectId;
-  debtee_id: ObjectId;
+  debtor_id: typeof ObjectId;
+  debtee_id: typeof ObjectId;
   amount: number;
   description: string;
   is_paid: boolean;
