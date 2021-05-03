@@ -1,38 +1,27 @@
-# create-svelte
+# Ootang
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte);
+A small debt tracker web app to keep tabs on your IOUs.
 
-## Creating a project
+## Installation
 
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm init svelte@next
-
-# create a new project in my-app
-npm init svelte@next my-app
+```sh
+npm install
 ```
 
-> Note: the `@next` is temporary
+After installing dependencies, you can run a locally exposed webserver with:
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+```sh
+npx svelte-kit dev --host
 ```
 
-## Building
+If you want to create a production build, use:
 
-Before creating a production version of your app, install an [adapter](https://kit.svelte.dev/docs#adapters) for your target environment. Then:
-
-```bash
-npm run build
+```sh
+npx svelte-kit build
 ```
 
-> You can preview the built app with `npm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+To run the production build, use:
+
+```sh
+npx svelte-kit preview
+```

@@ -55,7 +55,7 @@
       is_paid: false
     };
 
-    const res = await fetch(`/api/debt.json`, {
+    await fetch(`/api/debt.json`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
