@@ -5,7 +5,7 @@ import { getDebtsOfUser, addDebt } from "$lib/database";
 
 export const get: RequestHandler = async (request) => {
   const query = request.query;
-  const debts = getDebtsOfUser(query.get("user"));
+  const debts = await getDebtsOfUser(query.get("user"));
 
   return {
     status: 200,
@@ -18,7 +18,7 @@ export const get: RequestHandler = async (request) => {
 
 export const post: RequestHandler = async (request) => {
   const data = request.body.valueOf() as Debt;
-  addDebt(data);
+  await addDebt(data);
 
   return {
     status: 200,
