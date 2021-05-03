@@ -1,22 +1,23 @@
-import { MongoClient, ObjectId } from "mongodb";
+import mongodb from "mongodb";
+const { MongoClient, ObjectId } = mongodb;
 
 export type User = {
-  _id: ObjectId;
+  _id: typeof ObjectId;
   name: string;
 };
 
 export type DebtWithId = {
-  _id: ObjectId;
-  debtor_id: ObjectId;
-  debtee_id: ObjectId;
+  _id: typeof ObjectId;
+  debtor_id: typeof ObjectId;
+  debtee_id: typeof ObjectId;
   amount: number;
   description: string;
   is_paid: boolean;
 };
 
 export type Debt = {
-  debtor_id: ObjectId;
-  debtee_id: ObjectId;
+  debtor_id: typeof ObjectId;
+  debtee_id: typeof ObjectId;
   amount: number;
   description: string;
   is_paid: boolean;
@@ -77,7 +78,6 @@ export async function updateDebt(debtId: string, isPaid: boolean): Promise<void>
   const db = await getDb();
 
   const filter = { _id: ObjectId(debtId) };
-  const findResult = await db.collection("debts").findOne(filter);
 
   await db.collection("debts").updateOne(filter, {
     $set: {
