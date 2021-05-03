@@ -9,9 +9,9 @@
 
     const url = `/api/debt.json?user=${users[0]._id}`;
     const res = await fetch(url);
-    const result = await res.json();
 
     if (res.ok) {
+      const result = await res.json();
       return {
         props: {
           users: users,
@@ -40,6 +40,14 @@
   export let userTo: string;
   export let debts: DebtWithId[];
 
+  $: {
+    // If `debts` is an empty object (like when the database is still empty),
+    // we let it be an empty array instead.
+    if (debts && Object.keys(debts).length === 0 && debts.constructor === Object) {
+      debts = [];
+    }
+  }
+
   // FIXME: Probably cache these results.
   const fetchDebtsFromDatabase = async (userId: string) => {
     const url = `/api/debt.json?user=${userId}`;
@@ -57,12 +65,7 @@
 <Content>
   <Grid>
     <DebtForm
-      users={users.map((u) => {
-        return {
-          id: u._id,
-          text: u.name
-        };
-      })}
+      {users}
       on:submit={() => {
         fetchDebtsFromDatabase(userFrom);
       }}
@@ -82,13 +85,13 @@
       </Row>
     {:else}
       <Row padding>
-        {#each debts as debt (debt.id)}
+        {#each debts as debt (debt._id)}
           <Column sm={2} md={3}>
             <DebtTile
               bind:debt
-              currentUser={people.find((p) => p.id === userFrom)}
-              userFrom={people.find((p) => p.id === debt.from)}
-              userTo={people.find((p) => p.id === debt.to)}
+              currentUser={users.find((u) => u._id === userFrom)}
+              userFrom={users.find((u) => u._id === debt.debtor_id)}
+              userTo={users.find((u) => u._id === debt.debtee_id)}
               on:debtDelete={handleDebtDelete}
             />
           </Column>
