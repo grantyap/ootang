@@ -78,7 +78,6 @@ export async function updateDebt(debtId: string, isPaid: boolean): Promise<void>
   const db = await getDb();
 
   const filter = { _id: ObjectId(debtId) };
-  const findResult = await db.collection("debts").findOne(filter);
 
   await db.collection("debts").updateOne(filter, {
     $set: {
