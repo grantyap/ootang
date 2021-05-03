@@ -19,7 +19,7 @@
     property="og:description"
     content="Never forget about the money your friend owes you with Ootang."
   />
-  <meta property="og:image" content="/metaimage.png" />
+  <meta property="og:image" content="https://ootang.vercel.app/metaimage.png" />
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image" />
@@ -29,7 +29,7 @@
     property="twitter:description"
     content="Never forget about the money your friend owes you with Ootang."
   />
-  <meta property="twitter:image" content="/metaimage.png" />
+  <meta property="twitter:image" content="https://ootang.vercel.app/metaimage.png" />
 </svelte:head>
 
 <slot />
