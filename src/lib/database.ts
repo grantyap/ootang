@@ -25,7 +25,7 @@ export type Debt = {
 let cachedDb = null;
 
 async function getDb() {
-  const uri = process.env.MONGODB_URI;
+  const uri = import.meta.env.VITE_MONGODB_URI;
 
   if (cachedDb) {
     return cachedDb;
