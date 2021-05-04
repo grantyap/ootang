@@ -29,6 +29,8 @@
 </script>
 
 <script lang="ts">
+  import { flip } from "svelte/animate";
+  import { fade } from "svelte/transition";
   import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
   import DebtForm from "$lib/DebtForm/index.svelte";
   import DebtTile from "$lib/DebtTile/index.svelte";
@@ -49,12 +51,33 @@
   // FIXME: Probably cache these results.
   const fetchDebtsFromDatabase = async (userId: string) => {
     const url = `/api/debt.json?user=${userId}`;
-    const res = await fetch(url).then((res) => res.json());
-    debts = res;
+    const res = await fetch(url);
+    debts = await res.json();
   };
 
-  const handleDebtDelete = (e) => {
+  const handleDebtCreate = async (e) => {
+    debts = [...debts, e.detail];
+
+    await fetch(`/api/debt.json`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(e.detail)
+    });
+
+    await fetchDebtsFromDatabase(currentUser);
+  };
+
+  const handleDebtDelete = async (e) => {
     debts = debts.filter((d) => d._id !== e.detail);
+
+    const url = `/api/debt/${e.detail}.json`;
+    await fetch(url, {
+      method: "DELETE"
+    });
+
+    await fetchDebtsFromDatabase(currentUser);
   };
 </script>
 
@@ -64,15 +87,10 @@
   <Grid>
     <DebtForm
       {users}
-      on:submit={() => {
-        fetchDebtsFromDatabase(currentUser);
-      }}
-      on:click={() => {
-        fetchDebtsFromDatabase(currentUser);
-      }}
-      on:select={(e) => {
+      on:debtCreate={handleDebtCreate}
+      on:select={async (e) => {
         currentUser = e.detail.selectedItem.id;
-        fetchDebtsFromDatabase(currentUser);
+        await fetchDebtsFromDatabase(currentUser);
       }}
     />
     {#if debts.length === 0}
@@ -83,18 +101,44 @@
       </Row>
     {:else}
       <Row padding>
-        {#each debts as debt (debt._id)}
-          <Column sm={2} md={3}>
-            <DebtTile
-              bind:debt
-              currentUser={users.find((u) => u._id === currentUser)}
-              userFrom={users.find((u) => u._id === debt.debtor_id)}
-              userTo={users.find((u) => u._id === debt.debtee_id)}
-              on:debtDelete={handleDebtDelete}
-            />
-          </Column>
-        {/each}
+        <Column>
+          <!-- FIXME: Find out how to prevent scrollbars from showing up during the animations. -->
+          <div class="display-flex flex-wrap gap">
+            {#each debts as debt (debt._id)}
+              <div
+                transition:fade={{ duration: 80 }}
+                animate:flip={{ duration: 200 }}
+                on:outroend={async () => {
+                  await fetchDebtsFromDatabase(currentUser);
+                }}
+                style="min-width: 6rem; max-width: 16rem;"
+              >
+                <DebtTile
+                  bind:debt
+                  currentUser={users.find((u) => u._id === currentUser)}
+                  userFrom={users.find((u) => u._id === debt.debtor_id)}
+                  userTo={users.find((u) => u._id === debt.debtee_id)}
+                  on:debtDelete={handleDebtDelete}
+                />
+              </div>
+            {/each}
+          </div>
+        </Column>
       </Row>
     {/if}
   </Grid>
 </Content>
+
+<style>
+  .display-flex {
+    display: flex;
+  }
+
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+
+  .gap {
+    gap: 1rem;
+  }
+</style>

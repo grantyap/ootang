@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
   import {
     Row,
     Column,
@@ -9,7 +10,9 @@
     FormGroup,
     Dropdown
   } from "carbon-components-svelte";
-  import type { User } from "$lib/database";
+  import type { User, DebtWithId } from "$lib/database";
+
+  const dispatch = createEventDispatcher();
 
   export let users: User[];
 
@@ -37,12 +40,22 @@
     description = "";
   };
 
+  const notifyDebtCreate = (debt: DebtWithId) => {
+    dispatch("debtCreate", debt);
+  };
+
   // FIXME: Cache newly added entry, there's no need to
   //        refetch from the database.
   const handleOnSubmit = async (e) => {
     e.preventDefault();
 
-    e.detail = {
+    const debtId = await fetch(`/api/debt/uuid.json`).then(async (res) => {
+      const result = await res.json();
+      return result.id;
+    });
+
+    const newDebt = {
+      _id: debtId,
       debtor_id: users[userFromIndex]._id,
       debtee_id: users[userToIndex]._id,
       amount: moneyOwedValue,
@@ -50,15 +63,8 @@
       is_paid: false
     };
 
-    await fetch(`/api/debt.json`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(e.detail)
-    }).then(() => {
-      clearForm();
-    });
+    notifyDebtCreate(newDebt);
+    clearForm();
   };
 </script>
 
@@ -89,7 +95,7 @@
     </Column>
   </Row>
   <Row>
-    <Column sm={4} md={2}>
+    <Column sm={4} md={3}>
       <NumberInput
         id="amount"
         label="Amount owed"
@@ -100,7 +106,7 @@
         step={0.01}
       />
     </Column>
-    <Column sm={4} md={6}>
+    <Column sm={4} md={5}>
       <TextInput
         id="description"
         labelText="Description"
@@ -109,12 +115,13 @@
         disabled={isFromAndToSame}
         warn={description === ""}
         warnText="The description is empty."
+        maxlength={64}
       />
     </Column>
   </Row>
   <Row padding>
     <Column style="text-align: right;">
-      <Button type="submit" disabled={isFromAndToSame} on:click>Add</Button>
+      <Button type="submit" disabled={isFromAndToSame}>Add</Button>
     </Column>
   </Row>
 </Form>

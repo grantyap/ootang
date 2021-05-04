@@ -66,7 +66,8 @@ export async function getDebtsOfUser(userId: string): Promise<DebtWithId[]> {
   return debts;
 }
 
-export async function addDebt(data: Debt): Promise<void> {
+export async function addDebt(data: DebtWithId): Promise<void> {
+  data._id = ObjectId(data._id)
   data.debtor_id = ObjectId(data.debtor_id);
   data.debtee_id = ObjectId(data.debtee_id);
 
