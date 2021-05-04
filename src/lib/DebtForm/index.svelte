@@ -115,6 +115,7 @@
         disabled={isFromAndToSame}
         warn={description === ""}
         warnText="The description is empty."
+        maxlength={64}
       />
     </Column>
   </Row>
