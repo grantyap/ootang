@@ -29,6 +29,7 @@
 </script>
 
 <script lang="ts">
+  import { fade } from "svelte/transition";
   import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
   import DebtForm from "$lib/DebtForm/index.svelte";
   import DebtTile from "$lib/DebtTile/index.svelte";
@@ -92,13 +93,15 @@
       <Row padding>
         {#each debts as debt (debt._id)}
           <Column sm={2} md={3}>
-            <DebtTile
-              bind:debt
-              currentUser={users.find((u) => u._id === currentUser)}
-              userFrom={users.find((u) => u._id === debt.debtor_id)}
-              userTo={users.find((u) => u._id === debt.debtee_id)}
-              on:debtDelete={handleDebtDelete}
-            />
+            <div transition:fade={{ duration: 80 }}>
+              <DebtTile
+                bind:debt
+                currentUser={users.find((u) => u._id === currentUser)}
+                userFrom={users.find((u) => u._id === debt.debtor_id)}
+                userTo={users.find((u) => u._id === debt.debtee_id)}
+                on:debtDelete={handleDebtDelete}
+              />
+            </div>
           </Column>
         {/each}
       </Row>
