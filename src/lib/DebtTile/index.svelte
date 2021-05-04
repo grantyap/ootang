@@ -16,7 +16,7 @@
   let shouldDelete = false;
   let isDeleteModalOpen = false;
 
-  const handleCheckboxTick = () => {
+  const handleCheckboxTick = async () => {
     // NOTE: on:change seems to happen before Svelte can update
     //       the binded variable. This means that if we untick
     //       the checkbox, `debt.is_paid` is still true by the
@@ -24,7 +24,7 @@
     //       Thus, we check NOT `debt.is_paid`.
     const queryString = !debt.is_paid ? `?is_paid` : "";
     const url = `/api/debt/${debt._id}.json${queryString}`;
-    fetch(url, {
+    await fetch(url, {
       method: "PATCH"
     });
   };
