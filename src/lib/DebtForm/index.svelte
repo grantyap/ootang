@@ -10,7 +10,7 @@
     FormGroup,
     Dropdown
   } from "carbon-components-svelte";
-  import type { User, Debt } from "$lib/database";
+  import type { User, DebtWithId } from "$lib/database";
 
   const dispatch = createEventDispatcher();
 
@@ -40,7 +40,7 @@
     description = "";
   };
 
-  const notifyDebtCreate = (debt: Debt) => {
+  const notifyDebtCreate = (debt: DebtWithId) => {
     dispatch("debtCreate", debt);
   };
 
@@ -49,7 +49,13 @@
   const handleOnSubmit = async (e) => {
     e.preventDefault();
 
+    const debtId = await fetch(`/api/debt/uuid.json`).then(async (res) => {
+      const result = await res.json();
+      return result.id;
+    });
+
     const newDebt = {
+      _id: debtId,
       debtor_id: users[userFromIndex]._id,
       debtee_id: users[userToIndex]._id,
       amount: moneyOwedValue,

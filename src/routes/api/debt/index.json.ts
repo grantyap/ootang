@@ -1,5 +1,5 @@
 import type { RequestHandler } from "@sveltejs/kit";
-import type { Debt } from "$lib/database";
+import type { DebtWithId } from "$lib/database";
 
 import { getDebtsOfUser, addDebt } from "$lib/database";
 
@@ -17,7 +17,7 @@ export const get: RequestHandler = async (request) => {
 };
 
 export const post: RequestHandler = async (request) => {
-  const data = request.body.valueOf() as Debt;
+  const data = request.body.valueOf() as DebtWithId;
   await addDebt(data);
 
   return {
