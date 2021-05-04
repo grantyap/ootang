@@ -36,7 +36,7 @@
 
 <Tile>
   <div class:gray={debt.is_paid}>
-    <h4 class="bold">{debt.description}</h4>
+    <h4 class="bold wrap">{debt.description}</h4>
     <p>
       <span class="small">From:</span>
       <span
@@ -142,5 +142,9 @@
 
   .cursor-pointer {
     cursor: pointer;
+  }
+  
+  .wrap {
+    overflow-wrap: break-word;
   }
 </style>
