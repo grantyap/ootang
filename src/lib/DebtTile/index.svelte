@@ -29,13 +29,8 @@
     });
   };
 
-  const handleDelete = () => {
+  const notifyDebtDelete = () => {
     dispatch("debtDelete", debt._id);
-
-    const url = `/api/debt/${debt._id}.json`;
-    fetch(url, {
-      method: "DELETE"
-    });
   };
 </script>
 
@@ -90,7 +85,8 @@
     }}
     on:transitionend={() => {
       if (shouldDelete) {
-        handleDelete();
+        notifyDebtDelete();
+        shouldDelete = false;
       }
     }}
   >

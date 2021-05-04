@@ -47,6 +47,13 @@
     }
   }
 
+  // FIXME: Probably cache these results.
+  const fetchDebtsFromDatabase = async (userId: string) => {
+    const url = `/api/debt.json?user=${userId}`;
+    const res = await fetch(url);
+    debts = await res.json();
+  };
+
   const handleDebtCreate = async (e) => {
     debts = [...debts, e.detail];
 
@@ -57,17 +64,19 @@
       },
       body: JSON.stringify(e.detail)
     });
+
+    fetchDebtsFromDatabase(currentUser);
   };
 
-  // FIXME: Probably cache these results.
-  const fetchDebtsFromDatabase = async (userId: string) => {
-    const url = `/api/debt.json?user=${userId}`;
-    const res = await fetch(url).then((res) => res.json());
-    debts = res;
-  };
-
-  const handleDebtDelete = (e) => {
+  const handleDebtDelete = async (e) => {
     debts = debts.filter((d) => d._id !== e.detail);
+
+    const url = `/api/debt/${e.detail}.json`;
+    await fetch(url, {
+      method: "DELETE"
+    });
+
+    fetchDebtsFromDatabase(currentUser);
   };
 </script>
 
