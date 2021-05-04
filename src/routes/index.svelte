@@ -29,6 +29,7 @@
 </script>
 
 <script lang="ts">
+  import { fade } from "svelte/transition";
   import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
   import DebtForm from "$lib/DebtForm/index.svelte";
   import DebtTile from "$lib/DebtTile/index.svelte";
@@ -46,6 +47,13 @@
     }
   }
 
+  // FIXME: Probably cache these results.
+  const fetchDebtsFromDatabase = async (userId: string) => {
+    const url = `/api/debt.json?user=${userId}`;
+    const res = await fetch(url);
+    debts = await res.json();
+  };
+
   const handleDebtCreate = async (e) => {
     debts = [...debts, e.detail];
 
@@ -56,17 +64,19 @@
       },
       body: JSON.stringify(e.detail)
     });
+
+    await fetchDebtsFromDatabase(currentUser);
   };
 
-  // FIXME: Probably cache these results.
-  const fetchDebtsFromDatabase = async (userId: string) => {
-    const url = `/api/debt.json?user=${userId}`;
-    const res = await fetch(url).then((res) => res.json());
-    debts = res;
-  };
-
-  const handleDebtDelete = (e) => {
+  const handleDebtDelete = async (e) => {
     debts = debts.filter((d) => d._id !== e.detail);
+
+    const url = `/api/debt/${e.detail}.json`;
+    await fetch(url, {
+      method: "DELETE"
+    });
+
+    await fetchDebtsFromDatabase(currentUser);
   };
 </script>
 
@@ -77,9 +87,9 @@
     <DebtForm
       {users}
       on:debtCreate={handleDebtCreate}
-      on:select={(e) => {
+      on:select={async (e) => {
         currentUser = e.detail.selectedItem.id;
-        fetchDebtsFromDatabase(currentUser);
+        await fetchDebtsFromDatabase(currentUser);
       }}
     />
     {#if debts.length === 0}
@@ -90,15 +100,22 @@
       </Row>
     {:else}
       <Row padding>
-        {#each debts as debt (debt._id)}
+        {#each debts as debt}
           <Column sm={2} md={3}>
-            <DebtTile
-              bind:debt
-              currentUser={users.find((u) => u._id === currentUser)}
-              userFrom={users.find((u) => u._id === debt.debtor_id)}
-              userTo={users.find((u) => u._id === debt.debtee_id)}
-              on:debtDelete={handleDebtDelete}
-            />
+            <div
+              transition:fade={{ duration: 80 }}
+              on:outroend={async () => {
+                await fetchDebtsFromDatabase(currentUser);
+              }}
+            >
+              <DebtTile
+                bind:debt
+                currentUser={users.find((u) => u._id === currentUser)}
+                userFrom={users.find((u) => u._id === debt.debtor_id)}
+                userTo={users.find((u) => u._id === debt.debtee_id)}
+                on:debtDelete={handleDebtDelete}
+              />
+            </div>
           </Column>
         {/each}
       </Row>
