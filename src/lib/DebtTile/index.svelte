@@ -65,7 +65,7 @@
   <br />
   <Checkbox labelText="Paid" bind:checked={debt.is_paid} on:change={handleCheckboxTick} />
   {#if debt.is_paid}
-    <div class="absolute bottom-spacing right-spacing" transition:fade={{ duration: 100 }}>
+    <div class="absolute bottom-spacing right-spacing" transition:fade={{ duration: 80 }}>
       <button
         on:click={() => {
           isDeleteModalOpen = !isDeleteModalOpen;
