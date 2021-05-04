@@ -29,6 +29,7 @@
 </script>
 
 <script lang="ts">
+  import { flip } from "svelte/animate";
   import { fade } from "svelte/transition";
   import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
   import DebtForm from "$lib/DebtForm/index.svelte";
@@ -100,25 +101,44 @@
       </Row>
     {:else}
       <Row padding>
-        {#each debts as debt}
-          <Column sm={2} md={3}>
-            <div
-              transition:fade={{ duration: 80 }}
-              on:outroend={async () => {
-                await fetchDebtsFromDatabase(currentUser);
-              }}
-            >
-              <DebtTile
-                bind:debt
-                currentUser={users.find((u) => u._id === currentUser)}
-                userFrom={users.find((u) => u._id === debt.debtor_id)}
-                userTo={users.find((u) => u._id === debt.debtee_id)}
-                on:debtDelete={handleDebtDelete}
-              />
-            </div>
-          </Column>
-        {/each}
+        <Column>
+          <!-- FIXME: Find out how to prevent scrollbars from showing up during the animations. -->
+          <div class="display-flex flex-wrap gap">
+            {#each debts as debt (debt._id)}
+              <div
+                transition:fade={{ duration: 80 }}
+                animate:flip={{ duration: 200 }}
+                on:outroend={async () => {
+                  await fetchDebtsFromDatabase(currentUser);
+                }}
+                style="min-width: 6rem; max-width: 16rem;"
+              >
+                <DebtTile
+                  bind:debt
+                  currentUser={users.find((u) => u._id === currentUser)}
+                  userFrom={users.find((u) => u._id === debt.debtor_id)}
+                  userTo={users.find((u) => u._id === debt.debtee_id)}
+                  on:debtDelete={handleDebtDelete}
+                />
+              </div>
+            {/each}
+          </div>
+        </Column>
       </Row>
     {/if}
   </Grid>
 </Content>
+
+<style>
+  .display-flex {
+    display: flex;
+  }
+
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+
+  .gap {
+    gap: 1rem;
+  }
+</style>
