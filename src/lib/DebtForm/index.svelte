@@ -95,7 +95,7 @@
     </Column>
   </Row>
   <Row>
-    <Column sm={4} md={2}>
+    <Column sm={4} md={3}>
       <NumberInput
         id="amount"
         label="Amount owed"
@@ -106,7 +106,7 @@
         step={0.01}
       />
     </Column>
-    <Column sm={4} md={6}>
+    <Column sm={4} md={5}>
       <TextInput
         id="description"
         labelText="Description"
