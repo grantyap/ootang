@@ -65,7 +65,7 @@
       body: JSON.stringify(e.detail)
     });
 
-    fetchDebtsFromDatabase(currentUser);
+    await fetchDebtsFromDatabase(currentUser);
   };
 
   const handleDebtDelete = async (e) => {
@@ -76,7 +76,7 @@
       method: "DELETE"
     });
 
-    fetchDebtsFromDatabase(currentUser);
+    await fetchDebtsFromDatabase(currentUser);
   };
 </script>
 
@@ -87,9 +87,9 @@
     <DebtForm
       {users}
       on:debtCreate={handleDebtCreate}
-      on:select={(e) => {
+      on:select={async (e) => {
         currentUser = e.detail.selectedItem.id;
-        fetchDebtsFromDatabase(currentUser);
+        await fetchDebtsFromDatabase(currentUser);
       }}
     />
     {#if debts.length === 0}
@@ -100,9 +100,14 @@
       </Row>
     {:else}
       <Row padding>
-        {#each debts as debt (debt._id)}
+        {#each debts as debt}
           <Column sm={2} md={3}>
-            <div transition:fade={{ duration: 80 }}>
+            <div
+              transition:fade={{ duration: 80 }}
+              on:outroend={async () => {
+                await fetchDebtsFromDatabase(currentUser);
+              }}
+            >
               <DebtTile
                 bind:debt
                 currentUser={users.find((u) => u._id === currentUser)}
