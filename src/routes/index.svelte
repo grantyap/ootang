@@ -46,6 +46,18 @@
     }
   }
 
+  const handleDebtCreate = async (e) => {
+    debts = [...debts, e.detail];
+
+    await fetch(`/api/debt.json`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(e.detail)
+    });
+  };
+
   // FIXME: Probably cache these results.
   const fetchDebtsFromDatabase = async (userId: string) => {
     const url = `/api/debt.json?user=${userId}`;
@@ -64,12 +76,7 @@
   <Grid>
     <DebtForm
       {users}
-      on:submit={() => {
-        fetchDebtsFromDatabase(currentUser);
-      }}
-      on:click={() => {
-        fetchDebtsFromDatabase(currentUser);
-      }}
+      on:debtCreate={handleDebtCreate}
       on:select={(e) => {
         currentUser = e.detail.selectedItem.id;
         fetchDebtsFromDatabase(currentUser);

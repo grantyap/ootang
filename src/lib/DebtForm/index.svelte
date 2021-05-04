@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
   import {
     Row,
     Column,
@@ -9,7 +10,9 @@
     FormGroup,
     Dropdown
   } from "carbon-components-svelte";
-  import type { User } from "$lib/database";
+  import type { User, Debt } from "$lib/database";
+
+  const dispatch = createEventDispatcher();
 
   export let users: User[];
 
@@ -37,12 +40,16 @@
     description = "";
   };
 
+  const notifyDebtCreate = (debt: Debt) => {
+    dispatch("debtCreate", debt);
+  };
+
   // FIXME: Cache newly added entry, there's no need to
   //        refetch from the database.
   const handleOnSubmit = async (e) => {
     e.preventDefault();
 
-    e.detail = {
+    const newDebt = {
       debtor_id: users[userFromIndex]._id,
       debtee_id: users[userToIndex]._id,
       amount: moneyOwedValue,
@@ -50,15 +57,8 @@
       is_paid: false
     };
 
-    await fetch(`/api/debt.json`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(e.detail)
-    }).then(() => {
-      clearForm();
-    });
+    notifyDebtCreate(newDebt);
+    clearForm();
   };
 </script>
 
@@ -114,7 +114,7 @@
   </Row>
   <Row padding>
     <Column style="text-align: right;">
-      <Button type="submit" disabled={isFromAndToSame} on:click>Add</Button>
+      <Button type="submit" disabled={isFromAndToSame}>Add</Button>
     </Column>
   </Row>
 </Form>
