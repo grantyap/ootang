@@ -121,7 +121,7 @@
         </Column>
       </Row>
     {:else}
-      <Row>
+      <Row padding>
         <Column>
           <AmountOwed {debts} {users} {currentUserId} on:allDebtsPaid={handleAllDebtsPaid} />
         </Column>
