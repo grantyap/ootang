@@ -123,7 +123,7 @@
     {:else}
       <Row>
         <Column>
-          <AmountOwed {debts} {users} {currentUserId} on:allDebtsPaid={handleAllDebtsPaid}/>
+          <AmountOwed {debts} {users} {currentUserId} on:allDebtsPaid={handleAllDebtsPaid} />
         </Column>
       </Row>
       <Row padding>

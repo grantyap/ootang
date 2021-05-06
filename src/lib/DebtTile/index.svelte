@@ -143,7 +143,7 @@
   .cursor-pointer {
     cursor: pointer;
   }
-  
+
   .wrap {
     overflow-wrap: break-word;
   }
