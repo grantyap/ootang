@@ -95,7 +95,7 @@
     });
 
     debtIdsToMarkAsPaid.forEach(async (d) => {
-      await fetch(`api/debt/${d}.json?is_paid`, {
+      await fetch(`api/debt/${d}.json?is_paid=1`, {
         method: "PATCH"
       });
     });

@@ -4,12 +4,14 @@ import { updateDebt, deleteDebt } from "$lib/database";
 
 export const patch: RequestHandler = async (request) => {
   const { id } = request.params;
-  let isPaid = false;
-  if (request.query.has("is_paid")) {
-    isPaid = true;
+  const isPaidParam = request.query.get("is_paid");
+  if (isPaidParam) {
+    if (isPaidParam === "1") {
+      await updateDebt(id, true);
+    } else if (isPaidParam === "0") {
+      await updateDebt(id, false);
+    }
   }
-
-  await updateDebt(id, isPaid);
 
   return {
     status: 200,
