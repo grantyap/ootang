@@ -80,6 +80,26 @@
 
     await fetchDebtsFromDatabase(currentUserId);
   };
+
+  $: handleAllDebtsPaid = (e) => {
+    let debtIdsToMarkAsPaid = [];
+    debts = debts.map((d) => {
+      if (
+        (d.debtor_id === e.detail.from && d.debtee_id === e.detail.to) ||
+        (d.debtor_id === e.detail.to && d.debtee_id === e.detail.from)
+      ) {
+        d.is_paid = true;
+        debtIdsToMarkAsPaid = [...debtIdsToMarkAsPaid, d._id];
+      }
+      return d;
+    });
+
+    debtIdsToMarkAsPaid.forEach(async (d) => {
+      await fetch(`api/debt/${d}.json?is_paid`, {
+        method: "PATCH"
+      });
+    });
+  };
 </script>
 
 <Header company="Ootang" platformName="IOU Tracker" />
@@ -103,7 +123,7 @@
     {:else}
       <Row>
         <Column>
-          <AmountOwed {debts} {users} {currentUserId} />
+          <AmountOwed {debts} {users} {currentUserId} on:allDebtsPaid={handleAllDebtsPaid}/>
         </Column>
       </Row>
       <Row padding>

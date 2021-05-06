@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
   import { Button } from "carbon-components-svelte";
   import type { User, DebtWithId } from "$lib/database";
+
+  const dispatch = createEventDispatcher();
 
   export let debts: DebtWithId[];
   export let users: User[];
@@ -29,23 +32,10 @@
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
   };
 
-  const markAllDebtsPaid = (userFromId: string, userToId: string) => {
-    let debtIdsToMarkAsPaid = [];
-    debts = debts.map((d) => {
-      if (
-        (d.debtor_id === userFromId && d.debtee_id === userToId) ||
-        (d.debtor_id === userToId && d.debtee_id === userFromId)
-      ) {
-        d.is_paid = true;
-        debtIdsToMarkAsPaid = [...debtIdsToMarkAsPaid, d._id];
-      }
-      return d;
-    });
-
-    debtIdsToMarkAsPaid.forEach(async (d) => {
-      await fetch(`api/debt/${d}.json?is_paid`, {
-        method: "PATCH"
-      });
+  const notifyAllDebtsPaid = (userFromId, userToId) => {
+    dispatch("allDebtsPaid", {
+      from: userFromId,
+      to: userToId
     });
   };
 </script>
@@ -75,7 +65,7 @@
       <Button
         kind="ghost"
         size="small"
-        on:click={() => markAllDebtsPaid(currentUserId, otherUser._id)}>Mark all as paid</Button
+        on:click={() => notifyAllDebtsPaid(currentUserId, otherUser._id)}>Mark all as paid</Button
       >
     </div>
   {/if}
