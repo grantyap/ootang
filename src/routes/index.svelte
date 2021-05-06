@@ -1,171 +1,75 @@
-<script context="module" lang="ts">
-  import type { Load } from "@sveltejs/kit";
-  import type { User } from "$lib/database";
-
-  export const load: Load = async ({ fetch }) => {
-    const users: User[] = await fetch(`/api/users.json`).then((res) => {
-      return res.json();
-    });
-
-    const url = `/api/debt.json?user=${users[0]._id}`;
-    const res = await fetch(url);
-
-    if (res.ok) {
-      const result = await res.json();
-      return {
-        props: {
-          users: users,
-          currentUserId: users[0]._id,
-          debts: result
-        }
-      };
-    }
-
-    return {
-      status: res.status,
-      error: new Error(`Could not load ${url}`)
-    };
-  };
-</script>
-
 <script lang="ts">
-  import { flip } from "svelte/animate";
-  import { fade } from "svelte/transition";
+  import { onDestroy } from "svelte";
   import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
-  import DebtForm from "$lib/DebtForm/index.svelte";
-  import DebtTile from "$lib/DebtTile/index.svelte";
-  import AmountOwed from "$lib/AmountOwed/index.svelte";
-  import type { DebtWithId } from "$lib/database";
 
-  export let users: User[];
-  export let currentUserId: string;
-  export let debts: DebtWithId[];
+  const generateRandomGroupId = () => {
+    const validChars = [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f"
+    ];
 
-  $: {
-    // If `debts` is an empty object (like when the database is still empty),
-    // we let it be an empty array instead.
-    if (debts && Object.keys(debts).length === 0 && debts.constructor === Object) {
-      debts = [];
+    let output = "";
+    for (let i = 0; i < 24; i++) {
+      const randomCharacter = validChars[Math.floor(Math.random() * validChars.length)];
+      output += randomCharacter;
     }
-  }
 
-  // FIXME: Probably cache these results.
-  const fetchDebtsFromDatabase = async (userId: string) => {
-    const url = `/api/debt.json?user=${userId}`;
-    const res = await fetch(url);
-    debts = await res.json();
+    return output;
   };
 
-  const handleDebtCreate = async (e) => {
-    debts = [...debts, e.detail];
+  const onInterval = (callback, milliseconds) => {
+    const interval = setInterval(callback, milliseconds);
 
-    await fetch(`/api/debt.json`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(e.detail)
+    onDestroy(() => {
+      clearInterval(interval);
     });
-
-    await fetchDebtsFromDatabase(currentUserId);
   };
 
-  const handleDebtDelete = async (e) => {
-    debts = debts.filter((d) => d._id !== e.detail);
+  let randomGroupId = generateRandomGroupId();
 
-    const url = `/api/debt/${e.detail}.json`;
-    await fetch(url, {
-      method: "DELETE"
-    });
-
-    await fetchDebtsFromDatabase(currentUserId);
-  };
-
-  $: handleAllDebtsPaid = async (e) => {
-    let debtIdsToMarkAsPaid = [];
-    debts = debts.map((d) => {
-      if (
-        (d.debtor_id === e.detail.from && d.debtee_id === e.detail.to) ||
-        (d.debtor_id === e.detail.to && d.debtee_id === e.detail.from)
-      ) {
-        d.is_paid = true;
-        debtIdsToMarkAsPaid = [...debtIdsToMarkAsPaid, d._id];
-      }
-      return d;
-    });
-
-    const fetchPromises = debtIdsToMarkAsPaid.map((d) => {
-      return fetch(`api/debt/${d}.json?is_paid=1`, {
-        method: "PATCH"
-      });
-    });
-    await Promise.all(fetchPromises);
-  };
+  onInterval(() => {
+    randomGroupId = generateRandomGroupId();
+  }, 1000);
 </script>
 
 <Header company="Ootang" platformName="IOU Tracker" />
 
 <Content>
   <Grid>
-    <DebtForm
-      {users}
-      on:debtCreate={handleDebtCreate}
-      on:select={async (e) => {
-        currentUserId = e.detail.selectedItem.id;
-        await fetchDebtsFromDatabase(currentUserId);
-      }}
-    />
-    {#if debts.length === 0}
-      <Row>
-        <Column>
-          <p>Nothing to pay ✨</p>
-        </Column>
-      </Row>
-    {:else}
-      <Row padding>
-        <Column>
-          <AmountOwed {debts} {users} {currentUserId} on:allDebtsPaid={handleAllDebtsPaid} />
-        </Column>
-      </Row>
-      <Row padding>
-        <Column>
-          <!-- FIXME: Find out how to prevent scrollbars from showing up during the animations. -->
-          <div class="display-flex flex-wrap gap">
-            {#each debts as debt (debt._id)}
-              <div
-                transition:fade={{ duration: 80 }}
-                animate:flip={{ duration: 200 }}
-                on:outroend={async () => {
-                  await fetchDebtsFromDatabase(currentUserId);
-                }}
-                style="min-width: 6rem; max-width: 16rem;"
-              >
-                <DebtTile
-                  bind:debt
-                  currentUser={users.find((u) => u._id === currentUserId)}
-                  userFrom={users.find((u) => u._id === debt.debtor_id)}
-                  userTo={users.find((u) => u._id === debt.debtee_id)}
-                  on:debtDelete={handleDebtDelete}
-                />
-              </div>
-            {/each}
-          </div>
-        </Column>
-      </Row>
-    {/if}
+    <Row padding>
+      <Column>
+        <h1>Oops!</h1>
+      </Column>
+    </Row>
+    <Row>
+      <Column>
+        <p>Did you include the group ID in the address bar?</p>
+      </Column>
+    </Row>
+    <Row padding>
+      <Column>
+        <code class="pink">https://ootang.vercel.app/{randomGroupId}</code>
+      </Column>
+    </Row>
   </Grid>
 </Content>
 
 <style>
-  .display-flex {
-    display: flex;
-  }
-
-  .flex-wrap {
-    flex-wrap: wrap;
-  }
-
-  .gap {
-    gap: 1rem;
+  .pink {
+    color: rgb(228, 0, 95);
   }
 </style>

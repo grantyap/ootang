@@ -66,6 +66,108 @@ export async function getDebtsOfUser(userId: string): Promise<DebtWithId[]> {
   return debts;
 }
 
+export async function getUsersAndDebtsOfGroup(groupId: string) {
+  // NOTE: On the server side, "service-worker.js" gets passed as
+  //       the `groupId` for some reason. Let's just ignore it.
+  if (groupId === "service-worker.js") {
+    return null;
+  }
+
+  const db = await getDb();
+  const result = await db
+    .collection("groups")
+    .aggregate([
+      {
+        $match: {
+          _id: ObjectId(groupId)
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user_list",
+          foreignField: "_id",
+          as: "users"
+        }
+      },
+      {
+        $lookup: {
+          from: "debts",
+          let: {
+            user_list: "$user_list"
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $in: ["$debtor_id", "$$user_list"]
+                    },
+                    {
+                      $in: ["$debtee_id", "$$user_list"]
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "debts"
+        }
+      }
+    ])
+    .toArray();
+
+  return result[0];
+}
+
+export async function getDebtsOfGroup(groupId: string) {
+  const db = await getDb();
+  const result = await db
+    .collection("groups")
+    .aggregate([
+      {
+        $match: {
+          _id: ObjectId(groupId)
+        }
+      },
+      {
+        $lookup: {
+          from: "debts",
+          let: {
+            user_list: "$user_list"
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $in: ["$debtor_id", "$$user_list"]
+                    },
+                    {
+                      $in: ["$debtee_id", "$$user_list"]
+                    }
+                  ]
+                }
+              }
+            }
+          ],
+          as: "debts"
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          debts: 1
+        }
+      }
+    ])
+    .toArray();
+
+  return result[0];
+}
+
 export async function addDebt(data: DebtWithId): Promise<void> {
   data._id = ObjectId(data._id);
   data.debtor_id = ObjectId(data.debtor_id);
