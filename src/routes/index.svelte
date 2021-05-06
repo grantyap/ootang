@@ -15,7 +15,7 @@
       return {
         props: {
           users: users,
-          currentUser: users[0]._id,
+          currentUserId: users[0]._id,
           debts: result
         }
       };
@@ -37,7 +37,7 @@
   import type { DebtWithId } from "$lib/database";
 
   export let users: User[];
-  export let currentUser: string;
+  export let currentUserId: string;
   export let debts: DebtWithId[];
 
   $: {
@@ -66,7 +66,7 @@
       body: JSON.stringify(e.detail)
     });
 
-    await fetchDebtsFromDatabase(currentUser);
+    await fetchDebtsFromDatabase(currentUserId);
   };
 
   const handleDebtDelete = async (e) => {
@@ -77,7 +77,7 @@
       method: "DELETE"
     });
 
-    await fetchDebtsFromDatabase(currentUser);
+    await fetchDebtsFromDatabase(currentUserId);
   };
 </script>
 
@@ -89,8 +89,8 @@
       {users}
       on:debtCreate={handleDebtCreate}
       on:select={async (e) => {
-        currentUser = e.detail.selectedItem.id;
-        await fetchDebtsFromDatabase(currentUser);
+        currentUserId = e.detail.selectedItem.id;
+        await fetchDebtsFromDatabase(currentUserId);
       }}
     />
     {#if debts.length === 0}
@@ -109,13 +109,13 @@
                 transition:fade={{ duration: 80 }}
                 animate:flip={{ duration: 200 }}
                 on:outroend={async () => {
-                  await fetchDebtsFromDatabase(currentUser);
+                  await fetchDebtsFromDatabase(currentUserId);
                 }}
                 style="min-width: 6rem; max-width: 16rem;"
               >
                 <DebtTile
                   bind:debt
-                  currentUser={users.find((u) => u._id === currentUser)}
+                  currentUser={users.find((u) => u._id === currentUserId)}
                   userFrom={users.find((u) => u._id === debt.debtor_id)}
                   userTo={users.find((u) => u._id === debt.debtee_id)}
                   on:debtDelete={handleDebtDelete}
