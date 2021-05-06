@@ -22,7 +22,7 @@
     //       the checkbox, `debt.is_paid` is still true by the
     //       time we enter this callback.
     //       Thus, we check NOT `debt.is_paid`.
-    const queryString = !debt.is_paid ? `?is_paid` : "";
+    const queryString = !debt.is_paid ? `?is_paid=1` : `?is_paid=0`;
     const url = `/api/debt/${debt._id}.json${queryString}`;
     await fetch(url, {
       method: "PATCH"

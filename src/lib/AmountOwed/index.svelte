@@ -42,7 +42,7 @@
 
 {#each users.filter((u) => u._id !== currentUserId) as otherUser}
   {#if totalAmountOwed(currentUserId, otherUser._id) !== 0}
-    <div class="display-flex flex-direction-row align-items-center">
+    <div class="display-flex flex-direction-row align-items-center gap">
       <p>
         {#if totalAmountOwed(currentUserId, otherUser._id) > 0}
           You owe <span class="bold">
@@ -50,7 +50,7 @@
           </span>
           a total of
           <span class="red">
-            ₱{totalAmountOwed(currentUserId, otherUser._id)}
+            ₱{totalAmountOwed(currentUserId, otherUser._id).toFixed(2)}
           </span>
         {:else if totalAmountOwed(currentUserId, otherUser._id) < 0}
           <span class="bold">
@@ -58,7 +58,7 @@
           </span>
           owes you a total of
           <span class="green">
-            ₱{totalAmountOwed(otherUser._id, currentUserId)}
+            ₱{totalAmountOwed(otherUser._id, currentUserId).toFixed(2)}
           </span>
         {/if}
       </p>
@@ -82,6 +82,10 @@
 
   .align-items-center {
     align-items: center;
+  }
+
+  .gap {
+    gap: 1rem;
   }
 
   .green {
