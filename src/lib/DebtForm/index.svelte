@@ -12,7 +12,7 @@
   } from "carbon-components-svelte";
   import type { User, DebtWithId } from "$lib/database";
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{ debtCreate: DebtWithId }>();
 
   export let users: User[];
 

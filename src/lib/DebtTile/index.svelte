@@ -6,7 +6,7 @@
   import { Tile, Checkbox, Modal } from "carbon-components-svelte";
   import { TrashCan32 } from "carbon-icons-svelte";
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{ debtDelete: string }>();
 
   export let debt: DebtWithId;
   export let currentUser: User = null;
@@ -143,7 +143,7 @@
   .cursor-pointer {
     cursor: pointer;
   }
-  
+
   .wrap {
     overflow-wrap: break-word;
   }
