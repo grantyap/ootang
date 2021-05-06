@@ -3,7 +3,7 @@
   import { Button } from "carbon-components-svelte";
   import type { User, DebtWithId } from "$lib/database";
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{ allDebtsPaid: { from: string; to: string } }>();
 
   export let debts: DebtWithId[];
   export let users: User[];
@@ -32,7 +32,7 @@
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
   };
 
-  const notifyAllDebtsPaid = (userFromId, userToId) => {
+  const notifyAllDebtsPaid = (userFromId: string, userToId: string) => {
     dispatch("allDebtsPaid", {
       from: userFromId,
       to: userToId
