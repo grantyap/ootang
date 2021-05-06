@@ -34,6 +34,7 @@
   import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
   import DebtForm from "$lib/DebtForm/index.svelte";
   import DebtTile from "$lib/DebtTile/index.svelte";
+  import AmountOwed from "$lib/AmountOwed/index.svelte";
   import type { DebtWithId } from "$lib/database";
 
   export let users: User[];
@@ -100,6 +101,11 @@
         </Column>
       </Row>
     {:else}
+      <Row>
+        <Column>
+          <AmountOwed {debts} {users} {currentUserId} />
+        </Column>
+      </Row>
       <Row padding>
         <Column>
           <!-- FIXME: Find out how to prevent scrollbars from showing up during the animations. -->
