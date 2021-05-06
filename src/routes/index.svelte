@@ -81,7 +81,7 @@
     await fetchDebtsFromDatabase(currentUserId);
   };
 
-  $: handleAllDebtsPaid = (e) => {
+  $: handleAllDebtsPaid = async (e) => {
     let debtIdsToMarkAsPaid = [];
     debts = debts.map((d) => {
       if (
@@ -94,11 +94,12 @@
       return d;
     });
 
-    debtIdsToMarkAsPaid.forEach(async (d) => {
-      await fetch(`api/debt/${d}.json?is_paid=1`, {
+    const fetchPromises = debtIdsToMarkAsPaid.map((d) => {
+      return fetch(`api/debt/${d}.json?is_paid=1`, {
         method: "PATCH"
       });
     });
+    await Promise.all(fetchPromises);
   };
 </script>
 
