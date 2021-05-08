@@ -49,9 +49,8 @@
   const handleOnSubmit = async (e) => {
     e.preventDefault();
 
-    const debtId = await fetch(`/api/debt/uuid.json`).then(async (res) => {
-      const result = await res.json();
-      return result.id;
+    const debtId = await fetch(`/api/utils/uuid`).then(async (res) => {
+      return await res.text();
     });
 
     const newDebt = {
