@@ -189,6 +189,24 @@ export async function updateDebt(debtId: string, isPaid: boolean): Promise<void>
   });
 }
 
+export async function markDebtsAsPaid(debtIds: string[]): Promise<void> {
+  debtIds = debtIds.map((d) => ObjectId(d));
+
+  const filter = {
+    _id: {
+      $in: debtIds
+    }
+  };
+  const updatedDocument = {
+    $set: {
+      is_paid: true
+    }
+  };
+
+  const db = await getDb();
+  await db.collection("debts").updateMany(filter, updatedDocument);
+}
+
 export async function deleteDebt(debtId: string): Promise<void> {
   const db = await getDb();
   await db.collection("debts").deleteOne({ _id: ObjectId(debtId) });

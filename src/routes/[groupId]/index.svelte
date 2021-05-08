@@ -109,12 +109,9 @@
       return d;
     });
 
-    const fetchPromises = debtIdsToMarkAsPaid.map((d) => {
-      return fetch(`/api/debt/${d}.json?is_paid=1`, {
-        method: "PATCH"
-      });
+    await fetch(`/api/debt/mark-paid?${debtIdsToMarkAsPaid.join("&")}`, {
+      method: "PATCH"
     });
-    await Promise.all(fetchPromises);
   };
 </script>
 
