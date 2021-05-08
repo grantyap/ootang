@@ -60,6 +60,10 @@
     }
   }
 
+  $: debtsOfCurrentUser = debts.filter(
+    (d) => d.debtor_id === currentUserId || d.debtee_id === currentUserId
+  );
+
   const fetchDebtsFromDatabase = async () => {
     // Wait for the FLIP animation to finish,
     // or else get jittery movement.
@@ -109,12 +113,9 @@
       return d;
     });
 
-    const fetchPromises = debtIdsToMarkAsPaid.map((d) => {
-      return fetch(`/api/debt/${d}.json?is_paid=1`, {
-        method: "PATCH"
-      });
+    await fetch(`/api/debt/mark-paid?${debtIdsToMarkAsPaid.join("&")}`, {
+      method: "PATCH"
     });
-    await Promise.all(fetchPromises);
   };
 </script>
 
@@ -130,7 +131,7 @@
         await fetchDebtsFromDatabase();
       }}
     />
-    {#if debts.length === 0}
+    {#if debtsOfCurrentUser.length === 0}
       <Row>
         <Column>
           <p>Nothing to pay ✨</p>
@@ -146,7 +147,7 @@
         <Column>
           <!-- FIXME: Find out how to prevent scrollbars from showing up during the animations. -->
           <div class="display-flex flex-wrap gap">
-            {#each debts.filter((d) => d.debtor_id === currentUserId || d.debtee_id === currentUserId) as debt (debt._id)}
+            {#each debtsOfCurrentUser as debt (debt._id)}
               <div
                 transition:fade={{ duration: 80 }}
                 animate:flip={{ duration: animateFlipDuration }}

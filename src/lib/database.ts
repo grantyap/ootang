@@ -23,6 +23,13 @@ export type Debt = {
   is_paid: boolean;
 };
 
+export type GroupData = {
+  _id: typeof ObjectId;
+  name: string;
+  users: User[];
+  debts: DebtWithId[];
+};
+
 let cachedDb = null;
 
 async function getDb() {
@@ -66,7 +73,7 @@ export async function getDebtsOfUser(userId: string): Promise<DebtWithId[]> {
   return debts;
 }
 
-export async function getUsersAndDebtsOfGroup(groupId: string) {
+export async function getUsersAndDebtsOfGroup(groupId: string): Promise<GroupData> {
   // NOTE: On the server side, "service-worker.js" gets passed as
   //       the `groupId` for some reason. Let's just ignore it.
   if (groupId === "service-worker.js") {
@@ -121,7 +128,7 @@ export async function getUsersAndDebtsOfGroup(groupId: string) {
   return result[0];
 }
 
-export async function getDebtsOfGroup(groupId: string) {
+export async function getDebtsOfGroup(groupId: string): Promise<GroupData> {
   const db = await getDb();
   const result = await db
     .collection("groups")
@@ -187,6 +194,24 @@ export async function updateDebt(debtId: string, isPaid: boolean): Promise<void>
       is_paid: isPaid
     }
   });
+}
+
+export async function markDebtsAsPaid(debtIds: string[]): Promise<void> {
+  debtIds = debtIds.map((d) => ObjectId(d));
+
+  const filter = {
+    _id: {
+      $in: debtIds
+    }
+  };
+  const updatedDocument = {
+    $set: {
+      is_paid: true
+    }
+  };
+
+  const db = await getDb();
+  await db.collection("debts").updateMany(filter, updatedDocument);
 }
 
 export async function deleteDebt(debtId: string): Promise<void> {
