@@ -65,7 +65,7 @@
         on:click={() => {
           isDeleteModalOpen = !isDeleteModalOpen;
         }}
-        class="display-flex border-none background-none cursor-pointer"
+        class="display-flex border-none background-none cursor-pointer transition hover-red active-red"
       >
         <TrashCan32 aria-label="Delete" style="width: 1.45rem; height: 1.45rem;" />
       </button>
@@ -110,15 +110,27 @@
   }
 
   .green {
-    color: rgb(12, 158, 90);
+    color: var(--cds-support-02);
   }
 
   .red {
-    color: rgb(243, 19, 3);
+    color: var(--cds-danger-01);
   }
 
   .gray {
-    color: #aaa;
+    color: var(--cds-text-03);
+  }
+
+  .transition {
+    transition: 0.08s;
+  }
+
+  .hover-red:hover {
+    color: var(--cds-danger-01);
+  }
+
+  .active-red:active {
+    color: var(--cds-active-danger);
   }
 
   .absolute {

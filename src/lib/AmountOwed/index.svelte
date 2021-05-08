@@ -89,11 +89,11 @@
   }
 
   .green {
-    color: rgb(12, 158, 90);
+    color: var(--cds-support-02);
   }
 
   .red {
-    color: rgb(243, 19, 3);
+    color: var(--cds-danger-01);
   }
 
   .bold {
