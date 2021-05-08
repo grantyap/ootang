@@ -65,10 +65,6 @@
   );
 
   const fetchDebtsFromDatabase = async () => {
-    // Wait for the FLIP animation to finish,
-    // or else get jittery movement.
-    await new Promise((resolve) => setTimeout(resolve, animateFlipDuration));
-
     const url = `/api/debt.json?group=${groupId}`;
     const res = await fetch(url);
     const result = await res.json();
@@ -117,6 +113,15 @@
       method: "PATCH"
     });
   };
+
+  let isTransitionComplete = false;
+
+  $: {
+    if (isTransitionComplete) {
+      fetchDebtsFromDatabase();
+      isTransitionComplete = false;
+    }
+  }
 </script>
 
 <Header company="Ootang" platformName={groupName} />
@@ -152,7 +157,7 @@
                 transition:fade={{ duration: 80 }}
                 animate:flip={{ duration: animateFlipDuration }}
                 on:outroend={async () => {
-                  await fetchDebtsFromDatabase();
+                  isTransitionComplete = true;
                 }}
                 style="min-width: 6rem; max-width: 16rem;"
               >
