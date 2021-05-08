@@ -7,10 +7,8 @@ export const get: RequestHandler = async () => {
   return {
     status: 200,
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "text/plain"
     },
-    body: {
-      id: new ObjectId()
-    }
+    body: new ObjectId().toHexString()
   };
 };
