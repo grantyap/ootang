@@ -72,6 +72,7 @@
     </div>
   {/if}
   <Modal
+    danger
     bind:open={isDeleteModalOpen}
     modalHeading="Delete card"
     primaryButtonText="Delete"
