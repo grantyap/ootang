@@ -121,6 +121,14 @@
     color: var(--cds-text-03);
   }
 
+  .gray .green {
+    color: rgba(var(--cds-support-02), 0.5);
+  }
+
+  .gray .red {
+    color: rgba(var(--cds-danger-01), 0.5);
+  }
+
   .transition {
     transition: 0.08s;
   }
