@@ -5,6 +5,7 @@
   import { fade } from "svelte/transition";
   import { Tile, Checkbox, Modal } from "carbon-components-svelte";
   import { TrashCan32 } from "carbon-icons-svelte";
+  import ObjectID from "bson-objectid";
 
   const dispatch = createEventDispatcher<{ debtDelete: string }>();
 
@@ -15,6 +16,7 @@
 
   let shouldDelete = false;
   let isDeleteModalOpen = false;
+  let date = new Date(ObjectID(debt._id).getTimestamp());
 
   const handleCheckboxTick = async () => {
     // NOTE: on:change seems to happen before Svelte can update
@@ -37,6 +39,13 @@
 <Tile>
   <div class:gray={debt.is_paid}>
     <h4 class="bold wrap">{debt.description}</h4>
+    <p class="small">
+      {date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      })}
+    </p>
     <p>
       <span class="small">From:</span>
       <span
