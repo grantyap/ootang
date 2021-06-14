@@ -6,32 +6,40 @@
     const { groupId } = page.params;
 
     const url = `/api/users/group/${groupId}.json`;
-    const res = await fetch(url);
 
-    if (!res.ok) {
+    try {
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        return {
+          status: res.status,
+          error: new Error(`Could not load ${url}`)
+        };
+      }
+
+      const group = await res.json();
+      if (!group) {
+        return {
+          status: 500,
+          error: new Error(`Could not get group`)
+        };
+      }
+
       return {
-        status: res.status,
-        error: new Error(`Could not load ${url}`)
+        props: {
+          groupId: group._id,
+          groupName: group.name,
+          users: group.users,
+          currentUserId: group.users[0]._id,
+          debts: group.debts
+        }
       };
-    }
-
-    const group = await res.json();
-    if (!group) {
+    } catch (err) {
       return {
         status: 500,
-        error: new Error(`Could not get group`)
+        error: new Error(`${err}`)
       };
     }
-
-    return {
-      props: {
-        groupId: group._id,
-        groupName: group.name,
-        users: group.users,
-        currentUserId: group.users[0]._id,
-        debts: group.debts
-      }
-    };
   };
 </script>
 
@@ -64,39 +72,32 @@
     (d) => d.debtor_id === currentUserId || d.debtee_id === currentUserId
   );
 
-  const fetchDebtsFromDatabase = async () => {
-    const url = `/api/debt.json?group=${groupId}`;
-    const res = await fetch(url);
-    const result = await res.json();
-    debts = result.debts;
-  };
-
-  const handleDebtCreate = async (e) => {
+  const handleDebtCreate = (e) => {
     debts = [...debts, e.detail];
 
-    await fetch(`/api/debt.json`, {
+    fetch(`/api/debt.json`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify(e.detail)
+    }).catch((err) => {
+      console.error(err);
     });
-
-    await fetchDebtsFromDatabase();
   };
 
-  const handleDebtDelete = async (e) => {
+  const handleDebtDelete = (e) => {
     debts = debts.filter((d) => d._id !== e.detail);
 
     const url = `/api/debt/${e.detail}.json`;
-    await fetch(url, {
+    fetch(url, {
       method: "DELETE"
+    }).catch((err) => {
+      console.error(err);
     });
-
-    await fetchDebtsFromDatabase();
   };
 
-  $: handleAllDebtsPaid = async (e) => {
+  $: handleAllDebtsPaid = (e) => {
     let debtIdsToMarkAsPaid = [];
     debts = debts.map((d) => {
       if (
@@ -109,19 +110,12 @@
       return d;
     });
 
-    await fetch(`/api/debt/mark-paid?${debtIdsToMarkAsPaid.join("&")}`, {
+    fetch(`/api/debt/mark-paid?${debtIdsToMarkAsPaid.join("&")}`, {
       method: "PATCH"
+    }).catch((err) => {
+      console.error(err);
     });
   };
-
-  let isTransitionComplete = false;
-
-  $: {
-    if (isTransitionComplete) {
-      fetchDebtsFromDatabase();
-      isTransitionComplete = false;
-    }
-  }
 </script>
 
 <Header company="Ootang" platformName={groupName} />
@@ -131,9 +125,8 @@
     <DebtForm
       {users}
       on:debtCreate={handleDebtCreate}
-      on:select={async (e) => {
+      on:select={(e) => {
         currentUserId = e.detail.selectedItem.id;
-        await fetchDebtsFromDatabase();
       }}
     />
     {#if debtsOfCurrentUser.length === 0}
@@ -156,9 +149,6 @@
               <div
                 transition:fade={{ duration: 80 }}
                 animate:flip={{ duration: animateFlipDuration }}
-                on:outroend={async () => {
-                  isTransitionComplete = true;
-                }}
                 style="min-width: 6rem; max-width: 16rem;"
               >
                 <DebtTile
