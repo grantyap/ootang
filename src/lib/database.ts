@@ -80,14 +80,21 @@ export async function getUsersAndDebtsOfGroup(groupId: string): Promise<GroupDat
     return null;
   }
 
+  // Let users access their group by its `short_name`.
+  // If not, fall back to the group's ObjectID.
+  let groupMatcher: { _id: typeof ObjectId } | { short_name: string };
+  try {
+    groupMatcher = { _id: ObjectId(groupId) };
+  } catch (err) {
+    groupMatcher = { short_name: groupId };
+  }
+
   const db = await getDb();
   const result = await db
     .collection("groups")
     .aggregate([
       {
-        $match: {
-          _id: ObjectId(groupId)
-        }
+        $match: groupMatcher
       },
       {
         $lookup: {
