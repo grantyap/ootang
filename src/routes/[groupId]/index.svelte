@@ -27,7 +27,6 @@
 
       return {
         props: {
-          groupId: group._id,
           groupName: group.name,
           users: group.users,
           currentUserId: group.users[0]._id,
@@ -54,7 +53,6 @@
 
   const animateFlipDuration = 200;
 
-  export let groupId: string;
   export let groupName: string;
   export let users: User[];
   export let currentUserId: string;
