@@ -38,3 +38,23 @@
 </svelte:head>
 
 <slot />
+
+<style>
+  :global(html) {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
+    min-height: calc(100% + env(safe-area-inset-top));
+  }
+
+  :global(.bx--header) {
+    padding-top: env(safe-area-inset-top);
+    /* 3rem is the height of Carbon's `Header` component. */
+    min-height: calc(3rem + env(safe-area-inset-top));
+  }
+
+  :global(.bx--modal) {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
+    transform: translate(0, env(safe-area-inset-top));
+  }
+</style>
