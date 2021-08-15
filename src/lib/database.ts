@@ -1,5 +1,4 @@
-import mongodb from "mongodb";
-const { MongoClient, ObjectId } = mongodb;
+import { MongoClient, ObjectId } from "mongodb";
 
 export type User = {
   _id: typeof ObjectId;

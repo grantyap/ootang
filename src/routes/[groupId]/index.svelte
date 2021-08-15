@@ -30,7 +30,8 @@
           groupName: group.name,
           users: group.users,
           currentUserId: group.users[0]._id,
-          debts: group.debts
+          debts: group.debts,
+          manifestUrl: page.path
         }
       };
     } catch (err) {
@@ -57,6 +58,7 @@
   export let users: User[];
   export let currentUserId: string;
   export let debts: DebtWithId[];
+  export let manifestUrl: string;
 
   $: {
     // If `debts` is an empty object (like when the database is still empty),
@@ -115,6 +117,14 @@
     });
   };
 </script>
+
+<svelte:head>
+  <link
+    rel="manifest"
+    crossorigin="use-credentials"
+    href={`/api/utils/manifest.json?path=${manifestUrl}`}
+  />
+</svelte:head>
 
 <Header company="Ootang" platformName={groupName} />
 
