@@ -30,6 +30,11 @@
     content="Never forget about the money your friend owes you with Ootang."
   />
   <meta property="twitter:image" content="https://ootang.vercel.app/meta_card.png" />
+
+  <!-- iOS compatibility -->
+  <link rel="apple-touch-icon" href="logo512.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 </svelte:head>
 
 <slot />
