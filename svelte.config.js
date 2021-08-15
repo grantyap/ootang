@@ -1,12 +1,12 @@
-const preprocess = require("svelte-preprocess");
-const { optimizeCarbonImports } = require("carbon-components-svelte/preprocess");
-const vercel = require("@sveltejs/adapter-vercel");
+import preprocess from "svelte-preprocess";
+import { optimizeImports } from "carbon-preprocess-svelte";
+import vercel from "@sveltejs/adapter-vercel";
 
 /** @type {import('@sveltejs/kit').Config} */
-module.exports = {
+const config = {
   // Consult https://github.com/sveltejs/svelte-preprocess
   // for more information about preprocessors
-  preprocess: [preprocess(), optimizeCarbonImports()],
+  preprocess: [preprocess(), optimizeImports()],
 
   kit: {
     // hydrate the <div id="svelte"> element in src/app.html
@@ -14,3 +14,5 @@ module.exports = {
     adapter: vercel()
   }
 };
+
+export default config;

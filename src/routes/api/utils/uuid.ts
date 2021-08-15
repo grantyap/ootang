@@ -1,7 +1,5 @@
 import type { RequestHandler } from "@sveltejs/kit";
-import mongodb from "mongodb";
-
-const { ObjectId } = mongodb;
+import { ObjectId } from "mongodb";
 
 export const get: RequestHandler = async () => {
   return {
