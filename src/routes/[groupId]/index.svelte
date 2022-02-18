@@ -1,6 +1,6 @@
 <script context="module" lang="ts">
   import type { Load } from "@sveltejs/kit";
-  import type { User } from "$lib/database";
+  import type { GroupData, User } from "$lib/database";
 
   export const load: Load = async ({ url, params, fetch }) => {
     const { groupId } = params;
@@ -17,7 +17,7 @@
         };
       }
 
-      const group = await res.json();
+      const group: GroupData = await res.json();
       if (!group) {
         return {
           status: 500,

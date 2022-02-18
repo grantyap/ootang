@@ -10,6 +10,7 @@
     FormGroup,
     Dropdown
   } from "carbon-components-svelte";
+  import type { DropdownItem } from "carbon-components-svelte/types/Dropdown/Dropdown";
   import type { User, DebtWithId } from "$lib/database";
 
   const dispatch = createEventDispatcher<{ debtCreate: DebtWithId }>();
@@ -33,7 +34,19 @@
 
   let description = "";
 
-  $: dropdownItems = users.map((u) => ({ id: u._id, text: u.name }));
+  $: dropdownItems = users.map((user): DropdownItem => {
+    let item: Partial<DropdownItem> = {
+      text: user.name
+    };
+
+    if (typeof user._id === "string") {
+      item = { ...item, id: user._id };
+    } else {
+      item = { ...item, id: user._id.toHexString() };
+    }
+
+    return item as Required<DropdownItem>;
+  });
 
   const clearForm = () => {
     moneyOwedValue = 0;

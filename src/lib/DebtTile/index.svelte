@@ -7,7 +7,7 @@
   import { TrashCan32 } from "carbon-icons-svelte";
   import ObjectID from "bson-objectid";
 
-  const dispatch = createEventDispatcher<{ debtDelete: string }>();
+  const dispatch = createEventDispatcher<{ debtDelete: DebtWithId }>();
 
   export let debt: DebtWithId;
   export let currentUser: User = null;
