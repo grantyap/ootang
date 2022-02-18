@@ -14,8 +14,6 @@
   export let userFrom: User;
   export let userTo: User;
 
-  let shouldDelete = false;
-  let isDeleteModalOpen = false;
   let date = new Date(ObjectID(debt._id).getTimestamp());
 
   const handleCheckboxTick = async () => {
@@ -32,7 +30,7 @@
   };
 
   const notifyDebtDelete = () => {
-    dispatch("debtDelete", debt._id);
+    dispatch("debtDelete", debt);
   };
 </script>
 
@@ -72,7 +70,7 @@
     <div class="absolute bottom-spacing right-spacing" transition:fade={{ duration: 80 }}>
       <button
         on:click={() => {
-          isDeleteModalOpen = !isDeleteModalOpen;
+          notifyDebtDelete();
         }}
         class="display-flex border-none background-none cursor-pointer transition hover-red active-red"
       >
@@ -80,28 +78,6 @@
       </button>
     </div>
   {/if}
-  <Modal
-    danger
-    bind:open={isDeleteModalOpen}
-    modalHeading="Delete card"
-    primaryButtonText="Delete"
-    secondaryButtonText="Cancel"
-    on:click:button--secondary={() => {
-      isDeleteModalOpen = !isDeleteModalOpen;
-    }}
-    on:submit={() => {
-      shouldDelete = true;
-      isDeleteModalOpen = !isDeleteModalOpen;
-    }}
-    on:transitionend={() => {
-      if (shouldDelete) {
-        notifyDebtDelete();
-        shouldDelete = false;
-      }
-    }}
-  >
-    Are you sure you want to delete {debt.description ? `"${debt.description}"` : "this card"}?
-  </Modal>
 </Tile>
 
 <style>

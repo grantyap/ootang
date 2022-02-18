@@ -46,7 +46,7 @@
 <script lang="ts">
   import { flip } from "svelte/animate";
   import { fade } from "svelte/transition";
-  import { Header, Content, Grid, Row, Column } from "carbon-components-svelte";
+  import { Header, Content, Grid, Row, Column, Modal } from "carbon-components-svelte";
   import DebtForm from "$lib/DebtForm/index.svelte";
   import DebtTile from "$lib/DebtTile/index.svelte";
   import AmountOwed from "$lib/AmountOwed/index.svelte";
@@ -59,6 +59,9 @@
   export let currentUserId: string;
   export let debts: DebtWithId[];
   export let manifestUrl: string;
+
+  let isDeleteModalOpen = false;
+  let debtToDelete: DebtWithId | null = null;
 
   $: {
     // If `debts` is an empty object (like when the database is still empty),
@@ -87,9 +90,14 @@
   };
 
   const handleDebtDelete = (e) => {
-    debts = debts.filter((d) => d._id !== e.detail);
+    isDeleteModalOpen = true;
+    debtToDelete = e.detail;
+  };
 
-    const url = `/api/debt/${e.detail}.json`;
+  const deleteDebt = () => {
+    debts = debts.filter((d) => d._id !== debtToDelete._id);
+
+    const url = `/api/debt/${debtToDelete._id}.json`;
     fetch(url, {
       method: "DELETE"
     }).catch((err) => {
@@ -127,7 +135,6 @@
 </svelte:head>
 
 <Header company="Ootang" platformName={groupName} />
-
 <Content>
   <Grid>
     <DebtForm
@@ -174,6 +181,24 @@
     {/if}
   </Grid>
 </Content>
+<Modal
+  danger
+  bind:open={isDeleteModalOpen}
+  modalHeading="Delete card"
+  primaryButtonText="Delete"
+  secondaryButtonText="Cancel"
+  on:click:button--secondary={() => {
+    isDeleteModalOpen = false;
+  }}
+  on:submit={() => {
+    deleteDebt();
+    isDeleteModalOpen = false;
+  }}
+>
+  Are you sure you want to delete {debtToDelete?.description
+    ? `"${debtToDelete.description}"`
+    : "this card"}?
+</Modal>
 
 <style>
   .display-flex {
