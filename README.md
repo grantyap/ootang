@@ -2,6 +2,16 @@
 
 A small debt tracker web app to keep tabs on your IOUs.
 
+## Environment variables
+
+To run properly, this project requires the presence of a `.env.local` file in
+the repository root. It should contain the `VITE_MONGODB_URI` to connect to the
+database.
+
+```sh
+VITE_MONGODB_URI="..."
+```
+
 ## Installation
 
 ```sh
