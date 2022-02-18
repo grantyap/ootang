@@ -25,8 +25,8 @@ const manifestWithPath = (path?: string) => {
   };
 };
 
-export const get: RequestHandler = async (request) => {
-  const path = request.query.get("path");
+export const get: RequestHandler = async ({ url }) => {
+  const path = url.searchParams.get("path");
 
   return {
     status: 200,

@@ -2,9 +2,9 @@ import type { RequestHandler } from "@sveltejs/kit";
 
 import { updateDebt, deleteDebt } from "$lib/database";
 
-export const patch: RequestHandler = async (request) => {
-  const { id } = request.params;
-  const isPaidParam = request.query.get("is_paid");
+export const patch: RequestHandler = async ({ params, url }) => {
+  const { id } = params;
+  const isPaidParam = url.searchParams.get("is_paid");
   if (isPaidParam) {
     if (isPaidParam === "1") {
       await updateDebt(id, true);
@@ -19,8 +19,8 @@ export const patch: RequestHandler = async (request) => {
   };
 };
 
-export const del: RequestHandler = async (request) => {
-  const { id } = request.params;
+export const del: RequestHandler = async ({ params }) => {
+  const { id } = params;
   await deleteDebt(id);
 
   return {

@@ -3,12 +3,12 @@ import type { DebtWithId } from "$lib/database";
 
 import { getDebtsOfUser, getDebtsOfGroup, addDebt } from "$lib/database";
 
-export const get: RequestHandler = async (request) => {
+export const get: RequestHandler = async ({ url }) => {
   let debts;
-  if (request.query.get("user")) {
-    debts = await getDebtsOfUser(request.query.get("user"));
-  } else if (request.query.get("group")) {
-    debts = await getDebtsOfGroup(request.query.get("group"));
+  if (url.searchParams.get("user")) {
+    debts = await getDebtsOfUser(url.searchParams.get("user"));
+  } else if (url.searchParams.get("group")) {
+    debts = await getDebtsOfGroup(url.searchParams.get("group"));
   } else {
     debts = "";
   }
@@ -22,7 +22,7 @@ export const get: RequestHandler = async (request) => {
   };
 };
 
-export const post: RequestHandler = async (request) => {
+export const post: RequestHandler = async ({ request }) => {
   const data = request.body.valueOf() as DebtWithId;
   await addDebt(data);
 
