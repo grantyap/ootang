@@ -32,17 +32,22 @@ export type GroupData = {
 let cachedDb = null;
 
 async function getDb() {
-  const uri = import.meta.env.VITE_MONGODB_URI;
-
   if (cachedDb) {
     return cachedDb;
   }
 
-  const client = await MongoClient.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+  const { VITE_MONGODB_URI } = import.meta.env;
+  if (typeof VITE_MONGODB_URI === "boolean") {
+    throw new Error("VITE_MONGODB_URI must be a string.");
+  }
+
+  const uri = VITE_MONGODB_URI;
+
+  const client = new MongoClient(uri, {
+    serverApi: ServerApiVersion.v1,
   });
-  const db = await client.db("ootang");
+  await client.connect();
+  const db = client.db("ootang");
 
   cachedDb = db;
   return db;
