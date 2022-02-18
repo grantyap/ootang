@@ -65,6 +65,7 @@ export async function getDebtsOfUser(userId: string): Promise<DebtWithId[]> {
         }
       ]
     })
+    .sort({ _id: -1 })
     .toArray();
 
   return debts;
@@ -109,6 +110,11 @@ export async function getUsersAndDebtsOfGroup(groupId: string): Promise<GroupDat
           },
           pipeline: [
             {
+              $sort: {
+                _id: -1
+              }
+            },
+            {
               $match: {
                 $expr: {
                   $and: [
@@ -149,6 +155,11 @@ export async function getDebtsOfGroup(groupId: string): Promise<GroupData> {
             user_list: "$user_list"
           },
           pipeline: [
+            {
+              $sort: {
+                _id: -1
+              }
+            },
             {
               $match: {
                 $expr: {
