@@ -2,18 +2,18 @@
   import type { Load } from "@sveltejs/kit";
   import type { User } from "$lib/database";
 
-  export const load: Load = async ({ page, fetch }) => {
-    const { groupId } = page.params;
+  export const load: Load = async ({ url, params, fetch }) => {
+    const { groupId } = params;
 
-    const url = `/api/users/group/${groupId}.json`;
+    const apiUrl = `/api/users/group/${groupId}.json`;
 
     try {
-      const res = await fetch(url);
+      const res = await fetch(apiUrl);
 
       if (!res.ok) {
         return {
           status: res.status,
-          error: new Error(`Could not load ${url}`)
+          error: new Error(`Could not load ${apiUrl}`)
         };
       }
 
@@ -31,7 +31,7 @@
           users: group.users,
           currentUserId: group.users[0]._id,
           debts: group.debts,
-          manifestUrl: page.path
+          manifestUrl: url
         }
       };
     } catch (err) {
