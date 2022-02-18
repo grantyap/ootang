@@ -12,6 +12,7 @@
   } from "carbon-components-svelte";
   import type { DropdownItem } from "carbon-components-svelte/types/Dropdown/Dropdown";
   import type { User, DebtWithId } from "$lib/database";
+  import ObjectID from "bson-objectid";
 
   const dispatch = createEventDispatcher<{ debtCreate: DebtWithId }>();
 
@@ -62,12 +63,8 @@
   const handleOnSubmit = async (e) => {
     e.preventDefault();
 
-    const debtId = await fetch(`/api/utils/uuid`).then(async (res) => {
-      return await res.text();
-    });
-
     const newDebt = {
-      _id: debtId,
+      _id: new ObjectID().toHexString(),
       debtor_id: users[userFromIndex]._id,
       debtee_id: users[userToIndex]._id,
       amount: moneyOwedValue,
