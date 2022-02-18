@@ -1,29 +1,22 @@
-import { MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
 
 export type User = {
-  _id: typeof ObjectId;
+  _id: ObjectId | string;
   name: string;
 };
 
-export type DebtWithId = {
-  _id: typeof ObjectId;
-  debtor_id: typeof ObjectId;
-  debtee_id: typeof ObjectId;
+export type Debt = {
+  debtor_id: ObjectId | string;
+  debtee_id: ObjectId | string;
   amount: number;
   description: string;
   is_paid: boolean;
 };
 
-export type Debt = {
-  debtor_id: typeof ObjectId;
-  debtee_id: typeof ObjectId;
-  amount: number;
-  description: string;
-  is_paid: boolean;
-};
+export type DebtWithId = Debt & { _id: ObjectId | string };
 
 export type GroupData = {
-  _id: typeof ObjectId;
+  _id: ObjectId | string;
   name: string;
   users: User[];
   debts: DebtWithId[];
@@ -44,7 +37,7 @@ async function getDb() {
   const uri = VITE_MONGODB_URI;
 
   const client = new MongoClient(uri, {
-    serverApi: ServerApiVersion.v1,
+    serverApi: ServerApiVersion.v1
   });
   await client.connect();
   const db = client.db("ootang");
@@ -65,10 +58,10 @@ export async function getDebtsOfUser(userId: string): Promise<DebtWithId[]> {
     .find({
       $or: [
         {
-          debtor_id: ObjectId(userId)
+          debtor_id: new ObjectId(userId)
         },
         {
-          debtee_id: ObjectId(userId)
+          debtee_id: new ObjectId(userId)
         }
       ]
     })
@@ -86,9 +79,9 @@ export async function getUsersAndDebtsOfGroup(groupId: string): Promise<GroupDat
 
   // Let users access their group by its `short_name`.
   // If not, fall back to the group's ObjectID.
-  let groupMatcher: { _id: typeof ObjectId } | { short_name: string };
+  let groupMatcher: { _id: ObjectId } | { short_name: string };
   try {
-    groupMatcher = { _id: ObjectId(groupId) };
+    groupMatcher = { _id: new ObjectId(groupId) };
   } catch (err) {
     groupMatcher = { short_name: groupId };
   }
@@ -146,7 +139,7 @@ export async function getDebtsOfGroup(groupId: string): Promise<GroupData> {
     .aggregate([
       {
         $match: {
-          _id: ObjectId(groupId)
+          _id: new ObjectId(groupId)
         }
       },
       {
@@ -187,9 +180,9 @@ export async function getDebtsOfGroup(groupId: string): Promise<GroupData> {
 }
 
 export async function addDebt(data: DebtWithId): Promise<void> {
-  data._id = ObjectId(data._id);
-  data.debtor_id = ObjectId(data.debtor_id);
-  data.debtee_id = ObjectId(data.debtee_id);
+  data._id = new ObjectId(data._id);
+  data.debtor_id = new ObjectId(data.debtor_id);
+  data.debtee_id = new ObjectId(data.debtee_id);
 
   const db = await getDb();
   await db.collection("debts").insertOne(data);
@@ -198,7 +191,7 @@ export async function addDebt(data: DebtWithId): Promise<void> {
 export async function updateDebt(debtId: string, isPaid: boolean): Promise<void> {
   const db = await getDb();
 
-  const filter = { _id: ObjectId(debtId) };
+  const filter = { _id: new ObjectId(debtId) };
 
   await db.collection("debts").updateOne(filter, {
     $set: {
@@ -207,8 +200,8 @@ export async function updateDebt(debtId: string, isPaid: boolean): Promise<void>
   });
 }
 
-export async function markDebtsAsPaid(debtIds: string[]): Promise<void> {
-  debtIds = debtIds.map((d) => ObjectId(d));
+export async function markDebtsAsPaid(debtIdStrings: string[]): Promise<void> {
+  const debtIds = debtIdStrings.map((d) => new ObjectId(d));
 
   const filter = {
     _id: {
@@ -227,5 +220,5 @@ export async function markDebtsAsPaid(debtIds: string[]): Promise<void> {
 
 export async function deleteDebt(debtId: string): Promise<void> {
   const db = await getDb();
-  await db.collection("debts").deleteOne({ _id: ObjectId(debtId) });
+  await db.collection("debts").deleteOne({ _id: new ObjectId(debtId) });
 }
