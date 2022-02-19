@@ -29,6 +29,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@sveltejs/svelte-virtual-list": "^3.0.1",
     "bson-objectid": "^2.0.1",
     "mongodb": "^4.1.0"
   }
