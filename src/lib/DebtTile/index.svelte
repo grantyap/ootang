@@ -1,20 +1,19 @@
 <script lang="ts">
   import type { User, DebtWithId } from "$lib/database";
-
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
   import { Tile, Checkbox, Modal } from "carbon-components-svelte";
   import { TrashCan32 } from "carbon-icons-svelte";
   import ObjectID from "bson-objectid";
+  import { currentUser } from "$lib/stores";
 
   const dispatch = createEventDispatcher<{ debtDelete: DebtWithId }>();
 
   export let debt: DebtWithId;
-  export let currentUser: User = null;
   export let userFrom: User;
   export let userTo: User;
 
-  let date = new Date(ObjectID(debt._id).getTimestamp());
+  let date = new Date(new ObjectID(debt._id as string).getTimestamp());
 
   const handleCheckboxTick = async () => {
     // NOTE: on:change seems to happen before Svelte can update
@@ -34,7 +33,7 @@
   };
 </script>
 
-<Tile>
+<Tile style="max-width: 16rem;">
   <div class:gray={debt.is_paid}>
     <h4 class="bold wrap">{debt.description}</h4>
     <p class="small">
@@ -47,8 +46,8 @@
     <p>
       <span class="small">From:</span>
       <span
-        class:bold={debt.debtor_id === currentUser._id}
-        class:red={debt.debtor_id === currentUser._id}
+        class:bold={debt.debtor_id === $currentUser._id}
+        class:red={debt.debtor_id === $currentUser._id}
       >
         {userFrom.name}
       </span>
@@ -56,8 +55,8 @@
     <p>
       <span class="small">To:</span>
       <span
-        class:bold={debt.debtee_id === currentUser._id}
-        class:green={debt.debtee_id === currentUser._id}
+        class:bold={debt.debtee_id === $currentUser._id}
+        class:green={debt.debtee_id === $currentUser._id}
       >
         {userTo.name}
       </span>

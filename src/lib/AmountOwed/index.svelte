@@ -1,15 +1,17 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { Button } from "carbon-components-svelte";
-  import type { User, DebtWithId } from "$lib/database";
+  import type { DebtWithId } from "$lib/database";
+  import { users, currentUser } from "$lib/stores";
+  import type { ObjectId } from "mongodb";
 
   const dispatch = createEventDispatcher<{ allDebtsPaid: { from: string; to: string } }>();
 
   export let debts: DebtWithId[];
-  export let users: User[];
-  export let currentUserId: string;
 
-  $: totalAmountOwed = (userFromId: string, userToId: string) => {
+  $: currentUserId = $currentUser._id;
+
+  $: totalAmountOwed = (userFromId: string | ObjectId, userToId: string | ObjectId) => {
     return debts
       .filter((d) => {
         if (
@@ -32,15 +34,15 @@
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0);
   };
 
-  const notifyAllDebtsPaid = (userFromId: string, userToId: string) => {
+  const notifyAllDebtsPaid = (userFromId: string | ObjectId, userToId: string | ObjectId) => {
     dispatch("allDebtsPaid", {
-      from: userFromId,
-      to: userToId
+      from: userFromId as string,
+      to: userToId as string
     });
   };
 </script>
 
-{#each users.filter((u) => u._id !== currentUserId) as otherUser}
+{#each $users.filter((u) => u._id !== currentUserId) as otherUser}
   {#if totalAmountOwed(currentUserId, otherUser._id) !== 0}
     <div class="display-flex flex-direction-row align-items-center gap">
       <p>

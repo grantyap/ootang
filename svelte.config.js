@@ -1,5 +1,5 @@
 import preprocess from "svelte-preprocess";
-import { optimizeImports } from "carbon-preprocess-svelte";
+import { optimizeImports, optimizeCss } from "carbon-preprocess-svelte";
 import vercel from "@sveltejs/adapter-vercel";
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -10,7 +10,10 @@ const config = {
 
   kit: {
     // hydrate the <div id="svelte"> element in src/app.html
-    adapter: vercel()
+    adapter: vercel(),
+    vite: {
+      plugins: [process.env.NODE_ENV === "production" && optimizeCss()]
+    }
   }
 };
 

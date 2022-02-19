@@ -28,8 +28,7 @@
       return {
         props: {
           groupName: group.name,
-          users: group.users,
-          currentUserId: group.users[0]._id,
+          initialUsers: group.users,
           debts: group.debts,
           manifestUrl: url
         }
@@ -44,35 +43,41 @@
 </script>
 
 <script lang="ts">
-  import { flip } from "svelte/animate";
-  import { fade } from "svelte/transition";
-  import { Header, Content, Grid, Row, Column, Modal } from "carbon-components-svelte";
-  import DebtForm from "$lib/DebtForm/index.svelte";
+  import {
+    Header,
+    HeaderUtilities,
+    HeaderGlobalAction,
+    Content,
+    Grid,
+    Row,
+    Column,
+    Modal,
+    Dropdown
+  } from "carbon-components-svelte";
+  import { Add20 } from "carbon-icons-svelte";
+  import VirtualList from "@sveltejs/svelte-virtual-list";
+  import DebtFormModal from "$lib/DebtFormModal/index.svelte";
   import DebtTile from "$lib/DebtTile/index.svelte";
   import AmountOwed from "$lib/AmountOwed/index.svelte";
+  import { users, currentUser, userDropdownItems } from "$lib/stores";
   import type { DebtWithId } from "$lib/database";
 
-  const animateFlipDuration = 200;
-
   export let groupName: string;
-  export let users: User[];
-  export let currentUserId: string;
-  export let debts: DebtWithId[];
+  export let initialUsers: User[];
+  export let debts: DebtWithId[] = [];
   export let manifestUrl: string;
 
+  let isDebtFormOpen = false;
   let isDeleteModalOpen = false;
   let debtToDelete: DebtWithId | null = null;
 
-  $: {
-    // If `debts` is an empty object (like when the database is still empty),
-    // we let it be an empty array instead.
-    if (debts && Object.keys(debts).length === 0 && debts.constructor === Object) {
-      debts = [];
-    }
-  }
+  $users = initialUsers;
+  $currentUser = $users[0];
+
+  $: selectedUserIndex = $userDropdownItems.findIndex((user) => user.id === $currentUser._id);
 
   $: debtsOfCurrentUser = debts.filter(
-    (d) => d.debtor_id === currentUserId || d.debtee_id === currentUserId
+    (d) => d.debtor_id === $currentUser._id || d.debtee_id === $currentUser._id
   );
 
   const handleDebtCreate = (e) => {
@@ -134,53 +139,57 @@
   />
 </svelte:head>
 
-<Header company="Ootang" platformName={groupName} />
-<Content>
-  <Grid>
-    <DebtForm
-      {users}
-      on:debtCreate={handleDebtCreate}
-      on:select={(e) => {
-        currentUserId = e.detail.selectedItem.id;
+<Header company="Ootang" platformName={groupName}>
+  <HeaderUtilities>
+    <HeaderGlobalAction
+      icon={Add20}
+      on:click={() => {
+        isDebtFormOpen = !isDebtFormOpen;
       }}
     />
+  </HeaderUtilities>
+</Header>
+<Content>
+  <Grid>
+    <Row padding>
+      <Column md={2}>
+        <Dropdown
+          titleText="User"
+          bind:selectedIndex={selectedUserIndex}
+          items={$userDropdownItems}
+          on:select={(e) => {
+            $currentUser = $users.find((user) => user._id === e.detail.selectedId);
+          }}
+        />
+      </Column>
+      <Column>
+        <AmountOwed {debts} on:allDebtsPaid={handleAllDebtsPaid} />
+      </Column>
+    </Row>
     {#if debtsOfCurrentUser.length === 0}
-      <Row>
+      <Row padding>
         <Column>
           <p>Nothing to pay ✨</p>
         </Column>
       </Row>
     {:else}
-      <Row padding>
-        <Column>
-          <AmountOwed {debts} {users} {currentUserId} on:allDebtsPaid={handleAllDebtsPaid} />
-        </Column>
-      </Row>
-      <Row padding>
-        <Column>
-          <!-- FIXME: Find out how to prevent scrollbars from showing up during the animations. -->
-          <div class="display-flex flex-wrap gap">
-            {#each debtsOfCurrentUser as debt (debt._id)}
-              <div
-                transition:fade={{ duration: 80 }}
-                animate:flip={{ duration: animateFlipDuration }}
-                style="min-width: 6rem; max-width: 16rem;"
-              >
-                <DebtTile
-                  bind:debt
-                  currentUser={users.find((u) => u._id === currentUserId)}
-                  userFrom={users.find((u) => u._id === debt.debtor_id)}
-                  userTo={users.find((u) => u._id === debt.debtee_id)}
-                  on:debtDelete={handleDebtDelete}
-                />
-              </div>
-            {/each}
-          </div>
+      <Row padding style="flex: 1;">
+        <Column style="flex: 1;">
+          <VirtualList items={debtsOfCurrentUser} let:item={debt}>
+            <DebtTile
+              {debt}
+              userFrom={$users.find((u) => u._id === debt.debtor_id)}
+              userTo={$users.find((u) => u._id === debt.debtee_id)}
+              on:debtDelete={handleDebtDelete}
+            />
+            <div class="mb-4" />
+          </VirtualList>
         </Column>
       </Row>
     {/if}
   </Grid>
 </Content>
+<DebtFormModal bind:open={isDebtFormOpen} on:debtCreate={handleDebtCreate} />
 <Modal
   danger
   bind:open={isDeleteModalOpen}
@@ -201,15 +210,7 @@
 </Modal>
 
 <style>
-  .display-flex {
-    display: flex;
-  }
-
-  .flex-wrap {
-    flex-wrap: wrap;
-  }
-
-  .gap {
-    gap: 1rem;
+  .mb-4 {
+    margin-bottom: 1rem;
   }
 </style>
