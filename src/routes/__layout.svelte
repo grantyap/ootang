@@ -41,9 +41,9 @@
 
 <style>
   :global(html) {
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    margin: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
       env(safe-area-inset-left);
-    min-height: calc(100% + env(safe-area-inset-top));
+    height: calc(100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom)));
   }
 
   :global(.bx--header) {
@@ -53,8 +53,7 @@
   }
 
   :global(.bx--modal) {
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    margin: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
       env(safe-area-inset-left);
-    transform: translate(0, env(safe-area-inset-top));
   }
 </style>

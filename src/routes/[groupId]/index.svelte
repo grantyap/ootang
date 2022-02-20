@@ -139,56 +139,58 @@
   />
 </svelte:head>
 
-<Header company="Ootang" platformName={groupName}>
-  <HeaderUtilities>
-    <HeaderGlobalAction
-      icon={Add20}
-      on:click={() => {
-        isDebtFormOpen = !isDebtFormOpen;
-      }}
-    />
-  </HeaderUtilities>
-</Header>
-<Content>
-  <Grid>
-    <Row padding>
-      <Column md={2}>
-        <Dropdown
-          titleText="User"
-          bind:selectedIndex={selectedUserIndex}
-          items={$userDropdownItems}
-          on:select={(e) => {
-            $currentUser = $users.find((user) => user._id === e.detail.selectedId);
-          }}
-        />
-      </Column>
-      <Column>
-        <AmountOwed {debts} on:allDebtsPaid={handleAllDebtsPaid} />
-      </Column>
-    </Row>
-    {#if debtsOfCurrentUser.length === 0}
+<div class="screen-height">
+  <Header company="Ootang" platformName={groupName}>
+    <HeaderUtilities>
+      <HeaderGlobalAction
+        icon={Add20}
+        on:click={() => {
+          isDebtFormOpen = !isDebtFormOpen;
+        }}
+      />
+    </HeaderUtilities>
+  </Header>
+  <Content style="flex: 1; display: flex; flex-direction: column; overflow-y: auto;">
+    <Grid style="flex: 1; display: flex; flex-direction: column; width: 100%; overflow-y: auto;">
       <Row padding>
+        <Column md={2}>
+          <Dropdown
+            titleText="User"
+            bind:selectedIndex={selectedUserIndex}
+            items={$userDropdownItems}
+            on:select={(e) => {
+              $currentUser = $users.find((user) => user._id === e.detail.selectedId);
+            }}
+          />
+        </Column>
         <Column>
-          <p>Nothing to pay ✨</p>
+          <AmountOwed {debts} on:allDebtsPaid={handleAllDebtsPaid} />
         </Column>
       </Row>
-    {:else}
-      <Row padding style="flex: 1;">
-        <Column style="flex: 1;">
-          <VirtualList items={debtsOfCurrentUser} let:item={debt}>
-            <DebtTile
-              {debt}
-              userFrom={$users.find((u) => u._id === debt.debtor_id)}
-              userTo={$users.find((u) => u._id === debt.debtee_id)}
-              on:debtDelete={handleDebtDelete}
-            />
-            <div class="mb-4" />
-          </VirtualList>
-        </Column>
-      </Row>
-    {/if}
-  </Grid>
-</Content>
+      {#if debtsOfCurrentUser.length === 0}
+        <Row padding>
+          <Column>
+            <p>Nothing to pay ✨</p>
+          </Column>
+        </Row>
+      {:else}
+        <Row padding style="flex: 1 1; overflow-y: auto;">
+          <Column>
+            <VirtualList items={debtsOfCurrentUser} let:item={debt}>
+              <DebtTile
+                {debt}
+                userFrom={$users.find((u) => u._id === debt.debtor_id)}
+                userTo={$users.find((u) => u._id === debt.debtee_id)}
+                on:debtDelete={handleDebtDelete}
+              />
+              <div class="mb-4" />
+            </VirtualList>
+          </Column>
+        </Row>
+      {/if}
+    </Grid>
+  </Content>
+</div>
 <DebtFormModal bind:open={isDebtFormOpen} on:debtCreate={handleDebtCreate} />
 <Modal
   danger
@@ -210,6 +212,15 @@
 </Modal>
 
 <style>
+  .screen-height {
+    margin: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+      env(safe-area-inset-left);
+    height: calc(100vh - (env(safe-area-inset-top) + env(safe-area-inset-bottom)));
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
   .mb-4 {
     margin-bottom: 1rem;
   }
