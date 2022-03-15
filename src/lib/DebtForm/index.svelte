@@ -58,8 +58,6 @@
     dispatch("debtCreate", debt);
   };
 
-  // FIXME: Cache newly added entry, there's no need to
-  //        refetch from the database.
   const handleOnSubmit = async (e) => {
     e.preventDefault();
 

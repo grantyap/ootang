@@ -7,26 +7,28 @@
   import { TrashCan32 } from "carbon-icons-svelte";
   import ObjectID from "bson-objectid";
 
-  const dispatch = createEventDispatcher<{ debtDelete: DebtWithId }>();
+  const dispatch = createEventDispatcher<{ debtDelete: DebtWithId; error: string }>();
 
   export let debt: DebtWithId;
   export let currentUser: User = null;
   export let userFrom: User;
   export let userTo: User;
 
-  let date = new Date(ObjectID(debt._id).getTimestamp());
+  let date = new Date(new ObjectID(debt._id as string).getTimestamp());
 
-  const handleCheckboxTick = async () => {
-    // NOTE: on:change seems to happen before Svelte can update
-    //       the binded variable. This means that if we untick
-    //       the checkbox, `debt.is_paid` is still true by the
-    //       time we enter this callback.
-    //       Thus, we check NOT `debt.is_paid`.
-    const queryString = !debt.is_paid ? `?is_paid=1` : `?is_paid=0`;
-    const url = `/api/debt/${debt._id}.json${queryString}`;
-    await fetch(url, {
-      method: "PATCH"
-    });
+  const handleCheckboxTick = async (e) => {
+    const url = `/api/debt/${debt._id}.json?is_paid=${e.target.checked}`;
+    try {
+      const response = await fetch(url, {
+        method: "PATCH"
+      });
+      if (!response.ok) {
+        debt.is_paid = !debt.is_paid;
+        dispatch("error", `Status ${response.status} ${response.statusText}`);
+      }
+    } catch (err) {
+      dispatch("error", err);
+    }
   };
 
   const notifyDebtDelete = () => {
