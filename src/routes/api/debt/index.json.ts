@@ -23,7 +23,7 @@ export const get: RequestHandler = async ({ url }) => {
 };
 
 export const post: RequestHandler = async ({ request }) => {
-  const data = request.body.valueOf() as DebtWithId;
+  const data = (await request.json()) as DebtWithId;
   await addDebt(data);
 
   return {
