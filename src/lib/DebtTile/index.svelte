@@ -3,7 +3,7 @@
 
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
-  import { Tile, Checkbox, Modal } from "carbon-components-svelte";
+  import { Tile, Checkbox } from "carbon-components-svelte";
   import { TrashCan32 } from "carbon-icons-svelte";
   import ObjectID from "bson-objectid";
 
