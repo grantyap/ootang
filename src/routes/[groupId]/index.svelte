@@ -76,7 +76,7 @@
   );
 
   const handleDebtCreate = (e) => {
-    debts = [...debts, e.detail];
+    debts = [e.detail, ...debts];
 
     fetch(`/api/debt.json`, {
       method: "POST",
