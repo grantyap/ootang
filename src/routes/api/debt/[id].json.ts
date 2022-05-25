@@ -4,19 +4,32 @@ import { updateDebt, deleteDebt } from "$lib/database";
 
 export const patch: RequestHandler = async ({ params, url }) => {
   const { id } = params;
-  const isPaidParam = url.searchParams.get("is_paid");
-  if (isPaidParam) {
-    if (isPaidParam === "1") {
-      await updateDebt(id, true);
-    } else if (isPaidParam === "0") {
-      await updateDebt(id, false);
-    }
-  }
 
-  return {
-    status: 200,
-    body: ""
+  const isPaidParam = (): boolean => {
+    const isPaidParamString = url.searchParams.get("is_paid");
+
+    if (isPaidParamString === "true") {
+      return true;
+    } else if (isPaidParamString === "false") {
+      return false;
+    } else {
+      throw new Error(`is_paid must be 'true' or 'false'. Passed value: '${isPaidParamString}'`);
+    }
   };
+
+  try {
+    await updateDebt(id, isPaidParam());
+
+    return {
+      status: 200,
+      body: ""
+    };
+  } catch (error) {
+    return {
+      status: 400,
+      body: { error: `${error}` }
+    };
+  }
 };
 
 export const del: RequestHandler = async ({ params }) => {

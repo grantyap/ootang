@@ -24,7 +24,12 @@
       });
       if (!response.ok) {
         debt.is_paid = !debt.is_paid;
-        dispatch("error", `Status ${response.status} ${response.statusText}`);
+        const responseError = (await response.json()).error;
+        if (!responseError) {
+          dispatch("error", `Status ${response.status}`);
+        } else {
+          dispatch("error", `${responseError}`);
+        }
       }
     } catch (err) {
       dispatch("error", err);
