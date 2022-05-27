@@ -1,8 +1,12 @@
-import type { RequestHandler } from "@sveltejs/kit";
+import type { ResponseBody } from "@sveltejs/kit";
+import type { RequestHandler } from "./__types/[id].json";
 
 import { updateDebt, deleteDebt } from "$lib/database";
 
-export const patch: RequestHandler = async ({ params, url }) => {
+type PatchOutput = ResponseBody & {
+  error?: string;
+};
+export const patch: RequestHandler<PatchOutput> = async ({ params, url }) => {
   const { id } = params;
 
   const isPaidParam = (): boolean => {
