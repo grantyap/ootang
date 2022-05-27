@@ -31,7 +31,7 @@
           users: group.users,
           currentUserId: group.users[0]._id,
           debts: group.debts,
-          manifestUrl: url
+          manifestUrl: url.href
         }
       };
     } catch (err) {
